@@ -1,239 +1,60 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Review & Revision MVP</title>
-  <style>
-    /* ----- Basic Layout ----- */
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      display: flex;
-      min-height: 100vh;
-    }
-    .document-container {
-      flex: 2;
-      padding: 1rem 2rem;
-      overflow-y: auto;
-    }
-    .review-panel {
-      flex: 1;
-      border-left: 2px solid #ddd;
-      padding: 1rem;
-      background: #f9f9f9;
-      max-width: 350px;
-    }
-    h1, h2, h3 {
-      margin-top: 0;
-    }
-
-    /* ----- Progress Bar ----- */
-    .progress-bar-container {
-      background: #f0f0f0;
-      border-radius: 4px;
-      height: 20px;
-      margin-bottom: 1rem;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      background: #4285f4;
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    /* ----- Document Highlights ----- */
-    .highlight {
-      background-color: #ffff88;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .highlight:hover {
-      background-color: #ffeb3b;
-    }
-
-    /* ----- Review Item Styles ----- */
-    .review-item {
-      border: 1px solid #ddd;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 5px;
-      background: #fff;
-    }
-    .review-item h4 {
-      margin-top: 0;
-    }
-    .review-item textarea {
-      width: 100%;
-      min-height: 60px;
-      margin-top: 0.5rem;
-    }
-    .review-item button {
-      margin-top: 0.5rem;
-      padding: 0.4rem 0.8rem;
-      cursor: pointer;
-    }
-    .answered {
-      background: #dfffe0 !important;
-    }
-    /* A simple style to show answered items in a subtle green tint */
-
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review & Revision Demo</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Main Document Area -->
-  <div class="document-container">
-    <h1>Sample Contract</h1>
-    <p>
-      This is an example paragraph in the contract. Please review the 
-      <span class="highlight" data-item-id="section1">Indemnification Clause</span> 
-      and let us know your preferences.
-    </p>
-    <p>
-      We also need clarity on the 
-      <span class="highlight" data-item-id="section2">Payment Terms</span>. 
-      Please confirm your chosen payment schedule and currency.
-    </p>
-    <p>
-      Lastly, the 
-      <span class="highlight" data-item-id="section3">Governing Law</span> 
-      section must be reviewed to ensure compliance with relevant jurisdictions.
-    </p>
+  <!-- Header or Title -->
+  <header>
+    <h1>Review & Revision</h1>
+    <div id="progress-bar-container">
+      <div id="progress-bar"></div>
+      <span id="progress-text">0% Complete</span>
+    </div>
+  </header>
+
+  <!-- Main container with two columns: Doc Viewer (left) and Prompts (right) -->
+  <div class="main-container">
+
+    <!-- Document Viewer -->
+    <div class="document-viewer" id="document-viewer">
+      <h2>Contract Document (Sample)</h2>
+      <p id="section-1" 
+         class="highlightable"
+         onclick="highlightSection(1)">
+         <strong>Section 1: Indemnification Clause</strong><br>
+         The Parties agree to indemnify and hold harmless each other from any and all claims, damages, and liabilities...
+      </p>
+
+      <p id="section-2" 
+         class="highlightable"
+         onclick="highlightSection(2)">
+         <strong>Section 2: Payment Terms</strong><br>
+         Payment shall be made within 30 days of receiving an invoice. Late payments may be subject to penalties...
+      </p>
+
+      <p id="section-3"
+         class="highlightable"
+         onclick="highlightSection(3)">
+         <strong>Section 3: Dispute Resolution</strong><br>
+         In the event of any dispute arising under or in connection with this Agreement, the Parties shall...
+      </p>
+    </div>
+
+    <!-- Comments / Prompts -->
+    <div class="comments-panel">
+      <h2>Your To-Do List</h2>
+      <div id="prompts-container">
+        <!-- JavaScript will populate these prompts -->
+      </div>
+    </div>
+
   </div>
 
-  <!-- Review Panel -->
-  <div class="review-panel">
-    <h2>Review Items</h2>
-
-    <!-- Progress Bar -->
-    <div class="progress-bar-container">
-      <div id="progressBar" class="progress-bar-fill"></div>
-    </div>
-    <div id="reviewList">
-      <!-- Individual review items appear here -->
-    </div>
-  </div>
-
-  <script>
-    /************************************************************
-     * 1. Define the review items (these would normally come
-     *    from your backend or a database).
-     ************************************************************/
-    const reviewItemsData = [
-      {
-        id: 'section1',
-        title: 'Indemnification Clause',
-        prompt: 'Please confirm your preferred coverage for indemnification.',
-        response: '' // Will hold the client’s response
-      },
-      {
-        id: 'section2',
-        title: 'Payment Terms',
-        prompt: 'Please specify the payment schedule and currency.',
-        response: ''
-      },
-      {
-        id: 'section3',
-        title: 'Governing Law',
-        prompt: 'Please confirm which jurisdiction or state will govern this contract.',
-        response: ''
-      }
-    ];
-
-    /************************************************************
-     * 2. Render the review items in the side panel
-     ************************************************************/
-    const reviewList = document.getElementById('reviewList');
-    const progressBar = document.getElementById('progressBar');
-
-    // Attempt to load any saved responses from localStorage
-    let storedResponses = JSON.parse(localStorage.getItem('reviewResponses')) || {};
-
-    // Merge stored responses with our current data
-    reviewItemsData.forEach(item => {
-      if (storedResponses[item.id]) {
-        item.response = storedResponses[item.id];
-      }
-    });
-
-    // Function to update the progress bar
-    function updateProgressBar() {
-      const totalItems = reviewItemsData.length;
-      const answeredCount = reviewItemsData.filter(item => item.response.trim() !== '').length;
-      const percentage = (answeredCount / totalItems) * 100;
-      progressBar.style.width = percentage + '%';
-    }
-
-    // Function to render the items
-    function renderReviewItems() {
-      reviewList.innerHTML = '';
-      reviewItemsData.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('review-item');
-
-        // If there's a response, mark it as answered
-        if (item.response.trim() !== '') {
-          itemDiv.classList.add('answered');
-        }
-
-        itemDiv.innerHTML = `
-          <h4>${item.title}</h4>
-          <p>${item.prompt}</p>
-          <textarea id="resp-${item.id}">${item.response}</textarea>
-          <button data-item-id="${item.id}">Save</button>
-        `;
-        reviewList.appendChild(itemDiv);
-      });
-    }
-
-    // Initial render
-    renderReviewItems();
-    updateProgressBar();
-
-    /************************************************************
-     * 3. Handle saving responses
-     ************************************************************/
-    reviewList.addEventListener('click', function(e) {
-      if (e.target.tagName.toLowerCase() === 'button') {
-        const itemId = e.target.getAttribute('data-item-id');
-        const textArea = document.getElementById(`resp-${itemId}`);
-        const newResponse = textArea.value.trim();
-
-        // Update our local data
-        const itemToUpdate = reviewItemsData.find(item => item.id === itemId);
-        if (itemToUpdate) {
-          itemToUpdate.response = newResponse;
-        }
-
-        // Save to localStorage
-        // (In a real app, you'd send this to your backend)
-        storedResponses[itemId] = newResponse;
-        localStorage.setItem('reviewResponses', JSON.stringify(storedResponses));
-
-        // Rerender to update "answered" styling & progress
-        renderReviewItems();
-        updateProgressBar();
-      }
-    });
-
-    /************************************************************
-     * 4. Clicking a highlighted section in the doc automatically
-     *    scrolls to the corresponding review item.
-     ************************************************************/
-    document.querySelector('.document-container').addEventListener('click', function(e) {
-      if (e.target.classList.contains('highlight')) {
-        const targetId = e.target.getAttribute('data-item-id');
-        // scroll to the item in the panel
-        const targetElement = document.getElementById(`resp-${targetId}`);
-        if (targetElement) {
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Optionally, we could also flash the item visually
-        }
-      }
-    });
-  </script>
-
+  <script src="script.js"></script>
 </body>
-
 
