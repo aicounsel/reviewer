@@ -1,7 +1,7 @@
-/* Basic reset / typography */
+/* Basic Reset */
 * {
-  margin: 0;
-  padding: 0;
+  margin: 0; 
+  padding: 0; 
   box-sizing: border-box;
 }
 body {
@@ -10,15 +10,9 @@ body {
   padding: 20px;
 }
 
-/* Header & Progress Bar */
+/* Header / Progress Bar */
 header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   margin-bottom: 20px;
-}
-header h1 {
-  margin-bottom: 10px;
 }
 #progress-bar-container {
   position: relative;
@@ -26,18 +20,18 @@ header h1 {
   height: 20px;
   background: #dcdcdc;
   border-radius: 10px;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 #progress-bar {
   height: 100%;
   width: 0;
-  background: #4caf50; /* Just an example color */
+  background: #4caf50;
   border-radius: 10px;
   transition: width 0.4s;
 }
 #progress-text {
-  font-size: 0.9rem;
   margin-left: 8px;
+  font-size: 0.9rem;
 }
 
 /* Main Container */
@@ -46,34 +40,39 @@ header h1 {
   gap: 20px;
 }
 
-/* Document Viewer */
-.document-viewer {
+/* PDF Container */
+.pdf-container {
+  position: relative;
   flex: 1;
   background: #fff;
-  padding: 20px;
-  border-radius: 6px;
+  padding: 10px;
+  border-radius: 5px;
+  height: 80vh; /* or some fixed height */
+  overflow: auto; /* Scroll if PDF is tall */
 }
-.document-viewer h2 {
-  margin-bottom: 10px;
+
+/* The PDF pages will be rendered as canvases inside #pdf-viewer */
+#pdf-viewer canvas {
+  display: block;
+  margin: 10px auto; /* Center each page horizontally */
 }
-.highlightable {
-  cursor: pointer;
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-.highlightable.selected {
-  background: #fffae6; /* Subtle highlight when selected */
+
+/* Highlight overlay for comments */
+.highlight-box {
+  position: absolute; 
+  background: rgba(255, 255, 0, 0.4); /* semi-transparent yellow */
+  pointer-events: none; /* So clicks pass through to the PDF or we can handle them differently */
+  border: 1px solid gold;
 }
 
 /* Comments Panel */
 .comments-panel {
   width: 300px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 5px;
   padding: 20px;
-}
-.comments-panel h2 {
-  margin-bottom: 15px;
+  height: 80vh;
+  overflow-y: auto;
 }
 .prompt-item {
   margin-bottom: 20px;
@@ -83,17 +82,16 @@ header h1 {
 }
 .prompt-title {
   font-weight: bold;
-  margin-bottom: 8px;
 }
 .prompt-question {
-  margin-bottom: 8px;
   font-style: italic;
+  margin-bottom: 8px;
 }
 .prompt-input {
   width: 100%;
+  box-sizing: border-box;
   padding: 6px;
   margin-bottom: 6px;
   border-radius: 4px;
   border: 1px solid #ccc;
 }
-
