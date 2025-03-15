@@ -1,11 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review & Revision Demo</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Hello, this is a test!</h1>
-  <p>If you see this, your GitHub Pages settings are likely correct.</p>
+
+  <!-- Header or Title -->
+  <header>
+    <h1>Review & Revision</h1>
+    <div id="progress-bar-container">
+      <div id="progress-bar"></div>
+      <span id="progress-text">0% Complete</span>
+    </div>
+  </header>
+
+  <!-- Main container with two columns: Doc Viewer (left) and Prompts (right) -->
+  <div class="main-container">
+
+    <!-- Document Viewer -->
+    <div class="document-viewer" id="document-viewer">
+      <h2>Contract Document (Sample)</h2>
+      <p id="section-1" 
+         class="highlightable"
+         onclick="highlightSection(1)">
+         <strong>Section 1: Indemnification Clause</strong><br>
+         The Parties agree to indemnify and hold harmless each other from any and all claims, damages, and liabilities...
+      </p>
+
+      <p id="section-2" 
+         class="highlightable"
+         onclick="highlightSection(2)">
+         <strong>Section 2: Payment Terms</strong><br>
+         Payment shall be made within 30 days of receiving an invoice. Late payments may be subject to penalties...
+      </p>
+
+      <p id="section-3"
+         class="highlightable"
+         onclick="highlightSection(3)">
+         <strong>Section 3: Dispute Resolution</strong><br>
+         In the event of any dispute arising under or in connection with this Agreement, the Parties shall...
+      </p>
+    </div>
+
+    <!-- Comments / Prompts -->
+    <div class="comments-panel">
+      <h2>Your To-Do List</h2>
+      <div id="prompts-container">
+        <!-- JavaScript will populate these prompts -->
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
