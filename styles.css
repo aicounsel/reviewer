@@ -1,1 +1,99 @@
+/* Basic reset / typography */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  background: #f8f8f8;
+  padding: 20px;
+}
+
+/* Header & Progress Bar */
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+header h1 {
+  margin-bottom: 10px;
+}
+#progress-bar-container {
+  position: relative;
+  width: 300px;
+  height: 20px;
+  background: #dcdcdc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+#progress-bar {
+  height: 100%;
+  width: 0;
+  background: #4caf50; /* Just an example color */
+  border-radius: 10px;
+  transition: width 0.4s;
+}
+#progress-text {
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+/* Main Container */
+.main-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* Document Viewer */
+.document-viewer {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+}
+.document-viewer h2 {
+  margin-bottom: 10px;
+}
+.highlightable {
+  cursor: pointer;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+.highlightable.selected {
+  background: #fffae6; /* Subtle highlight when selected */
+}
+
+/* Comments Panel */
+.comments-panel {
+  width: 300px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 20px;
+}
+.comments-panel h2 {
+  margin-bottom: 15px;
+}
+.prompt-item {
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+}
+.prompt-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.prompt-question {
+  margin-bottom: 8px;
+  font-style: italic;
+}
+.prompt-input {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
 
