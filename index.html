@@ -1,95 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Client Document Review</title>
+  <meta charset="UTF-8">
+  <title>Protected Client Portal</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    #container {
-      display: flex;
-      height: 100vh;
-    }
-    #document {
-      flex: 2;
-      border-right: 1px solid #ccc;
-      overflow-y: auto;
-    }
-    #qa-panel {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #f9f9f9;
-    }
-    .question {
-      cursor: pointer;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background-color: #fff;
-    }
-    .question:hover {
-      background-color: #eee;
-    }
-    .highlight {
-      background-color: yellow;
-      transition: background-color 0.5s ease;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    #login { text-align: center; margin-top: 20%; }
+    #content { display: none; }
+    input { padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    #error { color: red; }
   </style>
 </head>
 <body>
-  <div id="container">
-    <!-- Document Display Section -->
-    <div id="document">
-      <!-- Embed the clean HTML document via an iframe.
-           Replace the src URL with your OneDrive file's public URL -->
-      <iframe id="docFrame" src="https://aicounsel1-my.sharepoint.com/:w:/g/personal/brett_aicounsel1_onmicrosoft_com/EYCjqU9C2uxJokjwBiEyyvcBDjIPyhPZogAz5q-nAa8n6Q?e=6LFISk" style="width:100%; height:100%; border:none;"></iframe>
-    </div>
+  <!-- Login Section -->
+  <div id="login">
+    <h2>Please Enter Password to Access the Document</h2>
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="checkPassword()">Submit</button>
+    <p id="error"></p>
+  </div>
 
-    <!-- Q&A Panel Section -->
-    <div id="qa-panel">
-      <h2>RReview Questions</h2>
-      <!-- Each question has a data-anchor attribute that corresponds to an anchor in the document.
-           For example, a comment stored with ID "_cmnt1" corresponds to an anchor like <a name="_cmntref1"> -->
-      <div class="question" data-anchor="_cmntref1">What are the fees going to be based on?</div>
-      <div class="question" data-anchor="_cmntref2">What proposal? Attached?</div>
-      <div class="question" data-anchor="_cmntref3">This is too vague.</div>
-      <!-- Add more questions as needed -->
-    </div>
+  <!-- Protected Content Section -->
+  <div id="content">
+    <!-- Here you can embed your secure document. For example, an iframe with a secure SharePoint link -->
+    <iframe id="docFrame" src="https://yoursharepointsite.sharepoint.com/:u:/r/sites/Automations/Shared%20Documents/First%20Last%20-%20Client%20Engagement%20Agreement%20-%20FINAL%20-%202025.03.17%20-%20Comments.docx.html" 
+            style="width:100%; height:100vh; border:none;"></iframe>
   </div>
 
   <script>
-    // Wait until the iframe is loaded before attaching events
-    document.getElementById('docFrame').addEventListener('load', function() {
-      // Attach click event listeners to each question in the Q&A panel
-      var questions = document.querySelectorAll('.question');
-      questions.forEach(function(question) {
-        question.addEventListener('click', function() {
-          // Get the anchor identifier from the data attribute
-          var anchorId = question.getAttribute('data-anchor');
-          // Access the document inside the iframe
-          var iframe = document.getElementById('docFrame');
-          var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          // Find the anchor element by its name attribute
-          var anchorElem = iframeDoc.querySelector('a[name="' + anchorId + '"]');
-          if (anchorElem) {
-            // Scroll the element into view smoothly
-            anchorElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add a temporary highlight effect
-            anchorElem.classList.add('highlight');
-            setTimeout(function() {
-              anchorElem.classList.remove('highlight');
-            }, 2000);
-          } else {
-            alert('Could not find the reference for this comment.');
-          }
-        });
-      });
-    });
+    // Set the expected password. In your example, for "Trent Kinney - Agreement" the password might be "TrentKinney"
+    const expectedPassword = "TrentKinney";
+
+    function checkPassword() {
+      var pwd = document.getElementById("password").value;
+      if (pwd === expectedPassword) {
+        // If password is correct, hide login and show content
+        document.getElementById("login").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        localStorage.setItem("authenticated", "true");
+      } else {
+        document.getElementById("error").innerText = "Incorrect password.";
+      }
+    }
+
+    // Optionally, check on page load if the user is already authenticated
+    window.onload = function() {
+      if (localStorage.getItem("authenticated") === "true") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      }
+    }
   </script>
 </body>
 </html>
