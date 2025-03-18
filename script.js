@@ -1,11 +1,26 @@
 // Wait until the iframe is fully loaded before attaching event listeners.
 document.getElementById('docFrame').addEventListener('load', function() {
+  // Track the last highlighted anchor to prevent duplicate highlighting
+  let lastHighlightedAnchor = null;
+  let lastHighlightTime = 0;
+  
   // Helper function to scroll and highlight the corresponding anchor in the iframe document.
   function highlightAnchor(anchorId) {
     if (!anchorId) {
       console.error("No anchor ID provided");
       return;
     }
+    
+    // Prevent duplicate highlights within a short time period (300ms)
+    const now = Date.now();
+    if (anchorId === lastHighlightedAnchor && now - lastHighlightTime < 300) {
+      console.log("Skipping duplicate highlight request for:", anchorId);
+      return;
+    }
+    
+    // Update tracking variables
+    lastHighlightedAnchor = anchorId;
+    lastHighlightTime = now;
     
     const iframe = document.getElementById('docFrame');
     if (!iframe) {
@@ -34,16 +49,28 @@ document.getElementById('docFrame').addEventListener('load', function() {
     }
   }
 
-  // Attach click event listener to each comment block.
+  // Add id/name attributes to each response field
+  document.querySelectorAll('.response-field').forEach(function(field, index) {
+    const parentBlock = field.closest('.comment-block');
+    const anchorId = parentBlock ? parentBlock.getAttribute('data-anchor') : `comment-${index}`;
+    
+    // Set unique id and name attributes based on the anchor ID
+    field.id = `response-${anchorId || index}`;
+    field.name = `response-${anchorId || index}`;
+  });
+
+  // Attach click event listener to each comment block, but only for clicks on the block itself, not its children
   document.querySelectorAll('.comment-block').forEach(function(block) {
-    block.addEventListener('click', function() {
-      const anchorId = this.getAttribute('data-anchor');
-      highlightAnchor(anchorId);
+    block.addEventListener('click', function(event) {
+      // Only trigger if the click was directly on the comment block, not on a child element
+      if (event.target === this) {
+        const anchorId = this.getAttribute('data-anchor');
+        highlightAnchor(anchorId);
+      }
     });
   });
 
-  // Attach a focus event to each response field so that when the user clicks into it,
-  // the corresponding anchor is highlighted.
+  // Attach a focus event to each response field
   document.querySelectorAll('.response-field').forEach(function(field) {
     field.addEventListener('focus', function() {
       const parentBlock = this.closest('.comment-block');
