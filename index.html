@@ -3,66 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>Client Review Portal</title>
-  <style>
-    /* Basic styling for the split view */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    #container {
-      display: flex;
-      height: 100vh;
-    }
-    #document {
-      flex: 2;
-      border-right: 1px solid #ccc;
-      overflow-y: auto;
-    }
-    #qa-panel {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #f9f9f9;
-    }
-    .comment-block {
-      margin-bottom: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: #fff;
-      cursor: pointer;
-    }
-    .comment-text {
-      font-weight: bold;
-    }
-    .response-field {
-      width: 100%;
-      height: 80px;
-      margin-top: 10px;
-      padding: 5px;
-      font-size: 14px;
-    }
-    .submit-btn {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-top: 20px;
-    }
-    /* Highlight style for anchors in the document */
-    .highlight {
-      background-color: yellow;
-      transition: background-color 0.5s ease;
-    }
-  </style>
+  <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="container">
-    <!-- Document Display Section -->
+    <!-- Document Display Section (Left) -->
     <div id="document">
       <!-- The iframe loads your updated HTML document from GitHub Pages -->
       <iframe id="docFrame" src="https://aicounsel.github.io/reviewer/client-document.html" style="width:100%; height:100%; border:none;"></iframe>
     </div>
-    <!-- Q&A Panel Section -->
+    <!-- Q&A Panel Section (Right) -->
     <div id="qa-panel">
       <h2>Review Comments</h2>
       
@@ -80,49 +31,12 @@
         <div class="comment-text">This is too vague.</div>
         <textarea class="response-field" placeholder="Enter your response here"></textarea>
       </div>
-      <!-- You can add more comment blocks as needed -->
       
       <button class="submit-btn" onclick="submitResponses()">Submit Responses</button>
     </div>
   </div>
-
-  <script>
-    // When a comment block is clicked, scroll the document in the iframe to the corresponding anchor.
-    document.querySelectorAll('.comment-block').forEach(function(block) {
-      block.addEventListener('click', function() {
-        var anchorId = block.getAttribute('data-anchor');
-        var iframe = document.getElementById('docFrame');
-        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        var anchorElem = iframeDoc.querySelector('a[name="' + anchorId + '"]');
-        if (anchorElem) {
-          anchorElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          anchorElem.classList.add('highlight');
-          setTimeout(function() {
-            anchorElem.classList.remove('highlight');
-          }, 2000);
-        } else {
-          alert('Could not locate the reference for this comment.');
-        }
-      });
-    });
-
-    // Function to collect and submit responses.
-    function submitResponses() {
-      var responses = [];
-      document.querySelectorAll('.comment-block').forEach(function(block) {
-        var commentText = block.querySelector('.comment-text').innerText;
-        var response = block.querySelector('.response-field').value;
-        var anchor = block.getAttribute('data-anchor');
-        responses.push({
-          anchor: anchor,
-          comment: commentText,
-          response: response
-        });
-      });
-      console.log("Collected Responses:", responses);
-      // You can later send these responses to a backend service (or to SharePoint) via an AJAX call.
-      alert("Responses have been submitted. Check console for details.");
-    }
-  </script>
+  
+  <!-- Link to external JavaScript file -->
+  <script src="script.js"></script>
 </body>
 </html>
