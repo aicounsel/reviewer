@@ -23,19 +23,19 @@
 
   <!-- Protected Content Section -->
   <div id="content">
-    <!-- Here you can embed your secure document. For example, an iframe with a secure SharePoint link -->
-    <iframe id="docFrame" src="https://yoursharepointsite.sharepoint.com/:u:/r/sites/Automations/Shared%20Documents/First%20Last%20-%20Client%20Engagement%20Agreement%20-%20FINAL%20-%202025.03.17%20-%20Comments.docx.html" 
+    <!-- Document embedded via an iframe -->
+    <iframe id="docFrame" src="https://aicounsel1-my.sharepoint.com/:u:/g/personal/brett_aicounsel1_onmicrosoft_com/EX6Z6mqkxEZHhdwV_t_MQPoBtONKn-LPLza6zhOPAO7Esg?e=WzTBH2" 
             style="width:100%; height:100vh; border:none;"></iframe>
   </div>
 
   <script>
-    // Set the expected password. In your example, for "Trent Kinney - Agreement" the password might be "TrentKinney"
+    // Set the expected password (for example, derived from the document name)
     const expectedPassword = "TrentKinney";
 
     function checkPassword() {
       var pwd = document.getElementById("password").value;
       if (pwd === expectedPassword) {
-        // If password is correct, hide login and show content
+        // Hide login and show content if the password is correct
         document.getElementById("login").style.display = "none";
         document.getElementById("content").style.display = "block";
         localStorage.setItem("authenticated", "true");
@@ -44,7 +44,7 @@
       }
     }
 
-    // Optionally, check on page load if the user is already authenticated
+    // Check on page load if the user is already authenticated
     window.onload = function() {
       if (localStorage.getItem("authenticated") === "true") {
         document.getElementById("login").style.display = "none";
