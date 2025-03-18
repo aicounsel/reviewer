@@ -1,1 +1,59 @@
+/* Basic styling for the split view */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
 
+#container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Document section (left side) */
+#document {
+  flex: 2;
+  border-right: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+/* Q&A panel (right side) */
+#qa-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f9f9f9;
+}
+
+.comment-block {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.comment-text {
+  font-weight: bold;
+}
+
+.response-field {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.submit-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+/* Highlight style for anchors in the document */
+.highlight {
+  background-color: yellow;
+  transition: background-color 0.5s ease;
+}
