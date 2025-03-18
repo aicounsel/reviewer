@@ -1,27 +1,25 @@
-/* Reset margins and paddings, and ensure full height */
-html, body {
+/* Basic styling for the split view */
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  font-family: Arial, sans-serif;
 }
 
-/* Container styles for left-right layout */
 #container {
   display: flex;
-  flex-direction: row; /* Ensure left-to-right alignment */
-  height: 100vh;       /* Full viewport height */
+  height: 100vh;
 }
 
-/* Left side: Document section */
+/* Document section (left side) */
 #document {
-  flex: 2;             /* 2 parts out of 3 */
+  flex: 2;
   border-right: 1px solid #ccc;
   overflow-y: auto;
 }
 
-/* Right side: Q&A panel */
+/* Q&A panel (right side) */
 #qa-panel {
-  flex: 1;             /* 1 part out of 3 */
+  flex: 1;
   padding: 20px;
   overflow-y: auto;
   background: #f9f9f9;
