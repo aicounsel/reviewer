@@ -1,55 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Protected Client Portal</title>
+  <meta charset="utf-8">
+  <title>Client Review Portal</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    #login { text-align: center; margin-top: 20%; }
-    #content { display: none; }
-    input { padding: 10px; font-size: 16px; }
-    button { padding: 10px 20px; font-size: 16px; }
-    #error { color: red; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #container {
+      display: flex;
+      height: 100vh;
+    }
+    /* Document section (left side) */
+    #document {
+      flex: 2;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+    }
+    /* Q&A panel (right side) */
+    #qa-panel {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    .comment-block {
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .comment-text {
+      font-weight: bold;
+    }
+    .response-field {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .submit-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    /* Highlight style for anchors in the document */
+    .highlight {
+      background-color: yellow;
+      transition: background-color 0.5s ease;
+    }
   </style>
 </head>
 <body>
-  <!-- Login Section -->
-  <div id="login">
-    <h2>Please Enter Password to Access the Document</h2>
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="checkPassword()">Submit</button>
-    <p id="error"></p>
-  </div>
-
-  <!-- Protected Content Section -->
-  <div id="content">
-    <!-- Document embedded via an iframe -->
-    <iframe id="docFrame" src="https://aicounsel1-my.sharepoint.com/:u:/g/personal/brett_aicounsel1_onmicrosoft_com/EX6Z6mqkxEZHhdwV_t_MQPoBtONKn-LPLza6zhOPAO7Esg?e=WzTBH2" 
-            style="width:100%; height:100vh; border:none;"></iframe>
+  <div id="container">
+    <!-- Left: Document Display -->
+    <div id="document">
+      <!-- Replace the src URL with the secure URL of your clean HTML document -->
+      <iframe id="docFrame" src="https://aicounsel1-my.sharepoint.com/:u:/g/personal/brett_aicounsel1_onmicrosoft_com/EX6Z6mqkxEZHhdwV_t_MQPoBtONKn-LPLza6zhOPAO7Esg?e=YjHsjK" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+    <!-- Right: Q&A Panel -->
+    <div id="qa-panel">
+      <h2>Review Comments</h2>
+      
+      <!-- Each comment-block corresponds to a review comment and includes a response textarea.
+           The data-anchor attribute must match the anchor name in the clean document.
+           You can eventually generate these blocks dynamically from your backend. -->
+      <div class="comment-block" data-anchor="_cmntref1">
+        <div class="comment-text">What are the fees going to be based on?</div>
+        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+      </div>
+      <div class="comment-block" data-anchor="_cmntref2">
+        <div class="comment-text">What proposal? Attached?</div>
+        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+      </div>
+      <div class="comment-block" data-anchor="_cmntref3">
+        <div class="comment-text">This is too vague.</div>
+        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+      </div>
+      <!-- Add more comment blocks as needed -->
+      
+      <!-- Submit button -->
+      <button class="submit-btn" onclick="submitResponses()">Submit Responses</button>
+    </div>
   </div>
 
   <script>
-    // Set the expected password (for example, derived from the document name)
-    const expectedPassword = "TrentKinney";
+    // When a comment block is clicked, scroll the iframe document to the corresponding anchor.
+    document.querySelectorAll('.comment-block').forEach(function(block) {
+      block.addEventListener('click', function() {
+        var anchorId = block.getAttribute('data-anchor');
+        var iframe = document.getElementById('docFrame');
+        var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        // Locate the anchor element by its name attribute
+        var anchorElem = iframeDoc.querySelector('a[name="' + anchorId + '"]');
+        if (anchorElem) {
+          anchorElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          anchorElem.classList.add('highlight');
+          setTimeout(function() {
+            anchorElem.classList.remove('highlight');
+          }, 2000);
+        } else {
+          alert('Could not locate the reference for this comment.');
+        }
+      });
+    });
 
-    function checkPassword() {
-      var pwd = document.getElementById("password").value;
-      if (pwd === expectedPassword) {
-        // Hide login and show content if the password is correct
-        document.getElementById("login").style.display = "none";
-        document.getElementById("content").style.display = "block";
-        localStorage.setItem("authenticated", "true");
-      } else {
-        document.getElementById("error").innerText = "Incorrect password.";
-      }
-    }
-
-    // Check on page load if the user is already authenticated
-    window.onload = function() {
-      if (localStorage.getItem("authenticated") === "true") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("content").style.display = "block";
-      }
+    // Function to collect and submit responses
+    function submitResponses() {
+      var responses = [];
+      document.querySelectorAll('.comment-block').forEach(function(block) {
+        var commentText = block.querySelector('.comment-text').innerText;
+        var response = block.querySelector('.response-field').value;
+        var anchor = block.getAttribute('data-anchor');
+        responses.push({
+          anchor: anchor,
+          comment: commentText,
+          response: response
+        });
+      });
+      console.log("Collected Responses:", responses);
+      // Here you can add code to send responses to your backend (e.g., via an AJAX call)
+      alert("Responses have been submitted. Check console for details.");
     }
   </script>
 </body>
