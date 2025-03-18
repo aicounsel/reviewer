@@ -57,3 +57,7 @@ body {
   background-color: yellow;
   transition: background-color 0.5s ease;
 }
+
+a.highlight, a.highlight span {
+  background-color: yellow !important;
+}
