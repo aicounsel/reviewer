@@ -4,7 +4,7 @@
  *************************************************/
 
 // Mock endpoint for comments (replace with your Power Automate JSON URL)
-const COMMENTS_URL = "https://prod-XX.westus.logic.azure.com:443/workflows/your-generated-flow-url";
+const COMMENTS_URL = "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
 
 /**
  * On page load, do the following:
