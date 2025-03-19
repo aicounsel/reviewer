@@ -1,63 +1,133 @@
-/* Basic styling for the split view */
+/* === Basic Resets & Typography === */
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
-  padding: 0;
   font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+h1, h2 {
+  margin: 0;
 }
 
-#container {
+/* === App Container === */
+#app {
   display: flex;
+  flex-direction: column;
   height: 100vh;
 }
 
-/* Document section (left side) */
-#document {
-  flex: 2;
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-
-/* Q&A panel (right side) */
-#qa-panel {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background: #f9f9f9;
-}
-
-.comment-block {
-  margin-bottom: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+/* === Header === */
+header {
   background: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5em 1em;
+  display: flex;
+  flex-direction: column;
+}
+.logo-and-title {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+#progress-bar-container {
+  margin-top: 0.5em;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+#progress-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #ececec;
+  position: relative;
+  /* We'll inject “diamonds” or markers via JS or absolutely placed elements */
+}
+
+/* === Main (Split) === */
+main {
+  flex: 1;
+  display: flex;
+  overflow: hidden; /* so iframes and comments scroll separately */
+}
+
+/* === Document Pane === */
+#document-pane {
+  width: 60%;
+  height: 100%;
+  border-right: 1px solid #ccc;
+  overflow: hidden;
+}
+#doc-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* === Comments Pane === */
+#comments-pane {
+  width: 40%;
+  padding: 1em;
+  overflow-y: auto;
+  background: #fafafa;
+}
+#comments-list {
+  margin-bottom: 1em;
+}
+
+/* Individual comment box */
+.comment-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 4px;
+}
+.comment-item header {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+.comment-text {
+  margin-bottom: 0.5em;
+  font-style: italic;
+}
+.response-area {
+  width: 100%;
+  min-height: 50px;
+  margin-bottom: 0.5em;
+}
+.mark-complete-btn {
+  display: inline-block;
+  padding: 0.3em 0.6em;
+  cursor: pointer;
+  border: 1px solid #007bff;
+  color: #007bff;
+  background: #fff;
+  border-radius: 4px;
+}
+.mark-complete-btn:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+/* === Highlights in the document === */
+.highlighted-text {
+  background-color: yellow;
+  transition: background-color 0.3s;
+}
+
+/* === Submit Button === */
+#submit-all-btn {
+  padding: 0.7em 1em;
+  font-size: 1em;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
-
-.comment-text {
-  font-weight: bold;
-}
-
-.response-field {
-  width: 100%;
-  height: 80px;
-  margin-top: 10px;
-  padding: 5px;
-  font-size: 14px;
-}
-
-.submit-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 20px;
-}
-
-/* Highlight style for anchors in the document */
-.highlight {
-  background-color: yellow;
-  transition: background-color 0.5s ease;
-}
-
-a.highlight, a.highlight span {
-  background-color: yellow !important;
+#submit-all-btn:hover {
+  background: #0056b3;
 }
