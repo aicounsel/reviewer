@@ -1,114 +1,225 @@
-// Wait until the iframe is fully loaded before attaching event listeners.
-document.getElementById('docFrame').addEventListener('load', function() {
-  // Track the last highlighted anchor to prevent duplicate highlighting
-  let lastHighlightedAnchor = null;
-  let lastHighlightTime = 0;
-  
-  // Helper function to scroll and highlight the corresponding anchor in the iframe document.
-  function highlightAnchor(anchorId) {
-    if (!anchorId) {
-      console.error("No anchor ID provided");
-      return;
-    }
-    
-    // Prevent duplicate highlights within a short time period (300ms)
-    const now = Date.now();
-    if (anchorId === lastHighlightedAnchor && now - lastHighlightTime < 300) {
-      console.log("Skipping duplicate highlight request for:", anchorId);
-      return;
-    }
-    
-    // Update tracking variables
-    lastHighlightedAnchor = anchorId;
-    lastHighlightTime = now;
-    
-    const iframe = document.getElementById('docFrame');
-    if (!iframe) {
-      console.error("Could not find docFrame element");
-      return;
-    }
-    
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    console.log("Looking for anchor with name:", anchorId);
+/*************************************************************
+  On page load, we:
+   1) Parse the DocumentID from the URL.
+   2) Set the iframe source to load the corresponding .html in /agreements/.
+   3) Fetch the comments JSON and filter by DocumentID.
+   4) Render the progress bar and comments list.
+   5) Handle highlight logic and “mark as complete” logic.
+**************************************************************/
 
-    // Use the data-anchor value directly.
-    const anchorElem = iframeDoc.querySelector('a[name="' + anchorId + '"]');
-    if (anchorElem) {
-      console.log("Found anchor:", anchorElem);
-      anchorElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Add the highlight class
-      anchorElem.classList.add('highlight');
-      
-      // Remove the highlight class after a delay
-      setTimeout(function() {
-        anchorElem.classList.remove('highlight');
-      }, 2000);
-    } else {
-      console.warn("Could not locate the reference for anchor:", anchorId);
+document.addEventListener("DOMContentLoaded", () => {
+  // 1) Get Document ID from URL ?documentId=...
+  const urlParams = new URLSearchParams(window.location.search);
+  const docId = urlParams.get("documentId") || "defaultDocId"; 
+  // If you prefer the docId to come from the actual path, parse window.location.pathname instead.
+
+  // 2) Load the corresponding .html in the iframe
+  const iframe = document.getElementById("doc-iframe");
+  iframe.src = `agreements/${docId}.html`;
+
+  // 3) Fetch comments JSON & filter
+  fetch("comments.json") // Adjust path if needed
+    .then(response => response.json())
+    .then(allComments => {
+      // Filter for those that match the docId
+      const docComments = allComments.filter(c => c.DocumentID === docId);
+
+      // If no comments found, handle gracefully
+      if (docComments.length === 0) {
+        console.log("No comments found for this DocumentID.");
+      }
+
+      // 4) Render the progress bar & comments list
+      renderProgressBar(docComments.length);
+      renderCommentsList(docComments);
+
+      // Listen for Submit All
+      const submitAllBtn = document.getElementById("submit-all-btn");
+      submitAllBtn.addEventListener("click", () => {
+        handleSubmitAll(docId, docComments);
+      });
+    })
+    .catch(err => {
+      console.error("Error fetching comments:", err);
+    });
+});
+
+/*************************************************************
+  Render a simple progress bar with N “segments” (diamonds or squares).
+  For demonstration, let's just add <span> elements for each step.
+**************************************************************/
+function renderProgressBar(numComments) {
+  const progressBar = document.getElementById("progress-bar");
+  progressBar.innerHTML = ""; // Clear any existing
+
+  for (let i = 0; i < numComments; i++) {
+    const stepEl = document.createElement("span");
+    stepEl.classList.add("progress-step");
+    stepEl.textContent = i + 1;
+    // We can style it as a diamond via CSS transform, or keep it simple
+    stepEl.style.display = "inline-block";
+    stepEl.style.width = "20px";
+    stepEl.style.height = "20px";
+    stepEl.style.lineHeight = "20px";
+    stepEl.style.textAlign = "center";
+    stepEl.style.marginRight = "8px";
+    stepEl.style.backgroundColor = "#ccc";
+    stepEl.style.color = "#fff";
+    stepEl.style.borderRadius = "3px";
+    stepEl.style.transform = "rotate(45deg)";
+    stepEl.style.cursor = "pointer";
+
+    progressBar.appendChild(stepEl);
+
+    // Optional: add a line or arrow between steps
+    if (i < numComments - 1) {
+      const connector = document.createElement("span");
+      connector.textContent = "---";
+      connector.style.marginRight = "8px";
+      progressBar.appendChild(connector);
     }
   }
+}
 
-  // Add id/name attributes to each response field
-  document.querySelectorAll('.response-field').forEach(function(field, index) {
-    const parentBlock = field.closest('.comment-block');
-    const anchorId = parentBlock ? parentBlock.getAttribute('data-anchor') : `comment-${index}`;
-    
-    // Set unique id and name attributes based on the anchor ID
-    field.id = `response-${anchorId || index}`;
-    field.name = `response-${anchorId || index}`;
-  });
+/*************************************************************
+  Render the comments list on the right pane.
+  We'll maintain an internal array to track each comment's status:
+    - "notTouched"
+    - "inProgress"
+    - "complete"
+**************************************************************/
+function renderCommentsList(comments) {
+  const commentsList = document.getElementById("comments-list");
+  commentsList.innerHTML = "";
 
-  // Attach click event listener to each comment block, but only for clicks on the block itself, not its children
-  document.querySelectorAll('.comment-block').forEach(function(block) {
-    block.addEventListener('click', function(event) {
-      // Only trigger if the click was directly on the comment block, not on a child element
-      if (event.target === this) {
-        const anchorId = this.getAttribute('data-anchor');
-        highlightAnchor(anchorId);
+  comments.forEach((comment, index) => {
+    // Create a container for each comment
+    const commentEl = document.createElement("div");
+    commentEl.classList.add("comment-item");
+
+    // Comment metadata header
+    const header = document.createElement("header");
+    header.textContent = `Comment #${index + 1} | ${comment.CommentAuthor} | ${comment.CommentDateTime}`;
+    commentEl.appendChild(header);
+
+    // Actual comment text
+    const commentTextP = document.createElement("p");
+    commentTextP.classList.add("comment-text");
+    commentTextP.textContent = comment.CommentText;
+    commentEl.appendChild(commentTextP);
+
+    // Response textarea
+    const responseArea = document.createElement("textarea");
+    responseArea.classList.add("response-area");
+    responseArea.placeholder = "Write your response here...";
+    commentEl.appendChild(responseArea);
+
+    // Mark Complete button
+    const completeBtn = document.createElement("button");
+    completeBtn.classList.add("mark-complete-btn");
+    completeBtn.textContent = "Mark as Complete";
+    commentEl.appendChild(completeBtn);
+
+    // Append to list
+    commentsList.appendChild(commentEl);
+
+    // Track status in an attribute or in memory
+    let status = "notTouched";
+
+    // PROGRESS BAR ELEM
+    const progressStep = document.querySelectorAll(".progress-step")[index];
+
+    // Events:
+    // 1) Focus in => highlight doc text, turn step "yellow"
+    responseArea.addEventListener("focus", () => {
+      if (status === "notTouched") {
+        status = "inProgress";
+        progressStep.style.backgroundColor = "yellow";
+      }
+      highlightDocumentText(comment.TextID, true);
+    });
+
+    // 2) Blur => if no text is present, revert to "notTouched", else remain "inProgress"
+    responseArea.addEventListener("blur", () => {
+      highlightDocumentText(comment.TextID, false);
+      if (!responseArea.value.trim() && status !== "complete") {
+        status = "notTouched";
+        progressStep.style.backgroundColor = "#ccc";
       }
     });
-  });
 
-  // Attach a focus event to each response field
-  document.querySelectorAll('.response-field').forEach(function(field) {
-    field.addEventListener('focus', function() {
-      const parentBlock = this.closest('.comment-block');
-      if (parentBlock) {
-        const anchorId = parentBlock.getAttribute('data-anchor');
-        highlightAnchor(anchorId);
-      }
+    // 3) Mark Complete => set status to "complete", step to "blue"
+    completeBtn.addEventListener("click", () => {
+      status = "complete";
+      progressStep.style.backgroundColor = "#007bff";
     });
   });
-}); // End of iframe onload event.
+}
 
-// Function to collect and submit responses.
-function submitResponses() {
-  const responses = [];
-  
-  document.querySelectorAll('.comment-block').forEach(function(block) {
-    const commentText = block.querySelector('.comment-text')?.innerText || '';
-    const responseField = block.querySelector('.response-field');
-    const response = responseField ? responseField.value : '';
-    const anchor = block.getAttribute('data-anchor');
-    
-    responses.push({
-      anchor: anchor,
-      comment: commentText,
-      response: response
+/*************************************************************
+  Highlight or un-highlight the relevant text in the document.
+  This depends on whether you can access the iframe’s DOM.
+**************************************************************/
+function highlightDocumentText(textID, shouldHighlight) {
+  // Attempt to highlight in the iframe
+  const iframe = document.getElementById("doc-iframe");
+  const doc = iframe.contentWindow.document; // same-domain only
+
+  if (!doc) return;
+
+  // Find the anchor or element with name=textID
+  const anchor = doc.querySelector(`a[name="${textID}"]`) || doc.getElementById(textID);
+  if (!anchor) return;
+
+  if (shouldHighlight) {
+    anchor.classList.add("highlighted-text");
+    // Scroll into view smoothly
+    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    anchor.classList.remove("highlighted-text");
+  }
+}
+
+/*************************************************************
+  Handle "Submit All" -> gather all responses & send to Power Automate
+**************************************************************/
+function handleSubmitAll(docId, comments) {
+  // Build a data object
+  const payload = {
+    DocumentID: docId,
+    Comments: []
+  };
+
+  // Grab the textareas from the DOM
+  const commentEls = document.querySelectorAll(".comment-item");
+  commentEls.forEach((item, index) => {
+    const textarea = item.querySelector("textarea");
+    const responseText = textarea.value.trim();
+    const commentID = comments[index].CommentID;
+
+    payload.Comments.push({
+      CommentID: commentID,
+      ResponseText: responseText
     });
   });
-  
-  console.log("Collected Responses:", responses);
-  
-  // You might want to send this data to a server instead of just logging it
-  // const result = await fetch('/api/submit-responses', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(responses)
-  // });
-  
-  alert("Responses have been submitted. Check console for details.");
-  
-  return responses; // Return the data for potential further processing
+
+  // For demo: just log it. In reality, you'd POST to Power Automate
+  console.log("Final payload:", payload);
+
+  /*
+  fetch("https://your-power-automate-endpoint.com", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log("Submitted successfully:", data);
+    alert("All answers submitted!");
+  })
+  .catch(err => {
+    console.error("Submission error:", err);
+    alert("There was an error submitting your responses.");
+  });
+  */
 }
