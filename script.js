@@ -26,15 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.src = `./agreements/${documentId}.html`;
 
   // Fetch comments JSON
-fetch(COMMENTS_URL, {
-  method: "POST", // since your flow uses an HTTP POST trigger
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ DocumentID: documentId })
-})
+fetch(COMMENTS_URL)
   .then((res) => res.json())
   .then((data) => {
-    // data now contains { DocumentID, Comments }
-    const commentsForDoc = data.Comments;
+    // 'data' is an object with shape: { DocumentID: "...", Comments: [ ... ] }
+    const documentId = getDocumentIdFromUrl();
+    // We assume the returned object is specifically for that DocumentID:
+    // So we just grab the array:
+    const commentsForDoc = data.Comments || [];
+
+    // Render UI
     renderProgressBar(commentsForDoc);
     renderComments(commentsForDoc);
   })
