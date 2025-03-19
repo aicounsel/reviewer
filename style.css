@@ -1,134 +1,215 @@
-/* === Basic Resets & Typography === */
+/* Basic Reset */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
+
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #f9f9f9;
   color: #333;
 }
-h1, h2 {
-  margin: 0;
-}
 
-/* === App Container === */
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* === Header === */
-header {
-  background: #fff;
-  border-bottom: 1px solid #ccc;
-  padding: 0.5em 1em;
-  display: flex;
-  flex-direction: column;
-}
-.logo-and-title {
-  display: flex;
-  align-items: center;
-  width: 100px
-  gap: 1em;
-}
-#progress-bar-container {
-  margin-top: 0.5em;
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-#progress-bar {
-  flex: 1;
-  height: 8px;
-  background-color: #ececec;
-  position: relative;
-  /* We'll inject “diamonds” or markers via JS or absolutely placed elements */
-}
-
-/* === Main (Split) === */
-main {
-  flex: 1;
-  display: flex;
-  overflow: hidden; /* so iframes and comments scroll separately */
-}
-
-/* === Document Pane === */
-#document-pane {
-  width: 60%;
+/* OPTIONAL Password Overlay */
+#passwordOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
-  border-right: 1px solid #ccc;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#passwordModal {
+  background: #fff;
+  padding: 1.5em;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 300px;
+}
+
+/* Hide main container if using password gating (show only after successful password).
+   You can also do this in JS if you prefer. */
+#mainContainer {
+  display: block; /* or none if you want to hide by default */
+  width: 100%;
+  height: 100%;
+}
+
+/* Top Bar */
+#topBar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 1em;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+#logoContainer {
+  flex: 0 0 auto;
+  margin-right: 2em;
+}
+
+#logoContainer img {
+  max-height: 40px;
+}
+
+/* Progress Bar container */
+#progressBar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0 1em;
+}
+
+/* We'll inject 'diamonds' or steps dynamically in JS. 
+   But let's define a style for them. */
+.progress-step {
+  width: 30px;
+  height: 30px;
+  transform: rotate(45deg);
+  background: gray;
+  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+/* A small line or connector between steps */
+.progress-connector {
+  width: 40px;
+  height: 4px;
+  background: gray;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: middle;
+  transition: background 0.3s;
+}
+
+/* Example color states for the steps/connector */
+.step-yellow {
+  background: #f6c343 !important; /* a shade of yellow */
+}
+
+.step-blue {
+  background: #3498db !important; /* a shade of blue */
+}
+
+/* Content Container: left and right panels */
+#contentContainer {
+  display: flex;
+  height: calc(100vh - 80px); /* subtract header height */
   overflow: hidden;
 }
-#doc-iframe {
+
+/* Left side: Document container */
+#documentContainer {
+  flex: 1 1 auto;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* The iframe that displays the actual cleaned doc */
+#documentFrame {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* === Comments Pane === */
-#comments-pane {
-  width: 40%;
+/* Right side: Comments container */
+#commentsContainer {
+  width: 400px;
+  max-width: 400px;
+  background: #fff;
   padding: 1em;
   overflow-y: auto;
-  background: #fafafa;
-}
-#comments-list {
-  margin-bottom: 1em;
 }
 
-/* Individual comment box */
+/* Individual comment item */
 .comment-item {
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
   padding: 1em;
   margin-bottom: 1em;
-  border-radius: 4px;
 }
-.comment-item header {
+
+.comment-header {
   font-weight: bold;
   margin-bottom: 0.5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
 .comment-text {
   margin-bottom: 0.5em;
-  font-style: italic;
+  font-size: 0.95rem;
 }
-.response-area {
+
+.comment-response {
+  margin-top: 0.5em;
+}
+
+.comment-response textarea {
   width: 100%;
-  min-height: 50px;
+  height: 60px;
+  resize: vertical;
   margin-bottom: 0.5em;
+  font-family: inherit;
+  font-size: 0.95rem;
 }
+
+.comment-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .mark-complete-btn {
-  display: inline-block;
-  padding: 0.3em 0.6em;
+  background: #eee;
+  padding: 0.5em 1em;
+  border: none;
   cursor: pointer;
-  border: 1px solid #007bff;
-  color: #007bff;
-  background: #fff;
-  border-radius: 4px;
+  transition: background 0.3s;
 }
+
 .mark-complete-btn:hover {
-  background: #007bff;
-  color: #fff;
+  background: #ddd;
 }
 
-/* === Highlights in the document === */
-.highlighted-text {
-  background-color: yellow;
-  transition: background-color 0.3s;
+/* Submit all button at the bottom */
+#submitContainer {
+  margin-top: 1em;
+  text-align: center;
 }
 
-/* === Submit Button === */
-#submit-all-btn {
-  padding: 0.7em 1em;
-  font-size: 1em;
-  background: #007bff;
+#submitAll {
+  background: #3498db;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  padding: 0.75em 1.5em;
   cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
 }
-#submit-all-btn:hover {
-  background: #0056b3;
+
+#submitAll:hover {
+  background: #2980b9;
+}
+
+/* Simple highlight effect in the document (if you want to highlight the text anchor). 
+   We'll add/remove this class in script.js */
+.highlighted-text {
+  background: yellow;
 }
