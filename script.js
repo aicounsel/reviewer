@@ -26,6 +26,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
 
+// Set the iframe to highlight
+const docIframe = document.getElementById("docIframe");
+
+  // Wait until the iframe finishes loading
+  docIframe.addEventListener("load", () => {
+    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
+    if (iframeDoc) {
+      // Inject the CSS for .highlighted-text
+      injectHighlightStyle(iframeDoc);
+    }
+  });
+  
   // Fetch comments JSON
 fetch(COMMENTS_URL, {
   method: "POST", // since your flow uses an HTTP POST trigger
@@ -82,6 +94,22 @@ function renderProgressBar(comments) {
     comment.stepElement = stepDiv;
   });
 }
+/**
+ * Highlight
+ */
+function injectHighlightStyle(iframeDoc) {
+  // Create a <style> node
+  const styleEl = iframeDoc.createElement("style");
+  styleEl.textContent = `
+    .highlighted-text {
+      background-color: yellow;
+      transition: background-color 0.3s ease;
+    }
+  `;
+  // Append to the <head> of the iframe
+  iframeDoc.head.appendChild(styleEl);
+}
+
 
 /**
  * Render comments in #commentContainer
@@ -223,21 +251,19 @@ function handleSubmitAll() {
 function highlightDocumentText(textID, highlight) {
   const docIframe = document.getElementById("docIframe");
   const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
-
   if (!iframeDoc) return;
 
-  // Find the anchor or span for the text
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
 
-  
   if (highlight) {
-  anchor.style.backgroundColor = 'yellow';
-} else {
-  anchor.style.backgroundColor = '';
+    // Add the CSS class
+    anchor.classList.add("highlighted-text");
+    // Scroll into view if desired
+    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    anchor.classList.remove("highlighted-text");
+  }
 }
-
-
-
  
 }
