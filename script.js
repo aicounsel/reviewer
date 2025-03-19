@@ -4,7 +4,7 @@
  *************************************************/
 
 // Mock endpoint for comments (replace with your Power Automate JSON URL)
-const COMMENTS_URL = "./comments.json"; // or "https://.../feed.json"
+const COMMENTS_URL = "https://prod-XX.westus.logic.azure.com:443/workflows/your-generated-flow-url";
 
 /**
  * On page load, do the following:
@@ -26,21 +26,22 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.src = `./agreements/${documentId}.html`;
 
   // Fetch comments JSON
-  fetch(COMMENTS_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      // Filter comments for this doc
-      const commentsForDoc = data.filter(
-        (comment) => comment.DocumentID === documentId
-      );
+fetch(COMMENTS_URL, {
+  method: "POST", // since your flow uses an HTTP POST trigger
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ DocumentID: documentId })
+})
+  .then((res) => res.json())
+  .then((data) => {
+    // data now contains { DocumentID, Comments }
+    const commentsForDoc = data.Comments;
+    renderProgressBar(commentsForDoc);
+    renderComments(commentsForDoc);
+  })
+  .catch((err) => {
+    console.error("Error fetching comments:", err);
+  });
 
-      // Initialize internal state
-      renderProgressBar(commentsForDoc);
-      renderComments(commentsForDoc);
-    })
-    .catch((err) => {
-      console.error("Error fetching comments:", err);
-    });
 
   // Set up "Submit All" button
   document
