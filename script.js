@@ -188,6 +188,7 @@ function renderComments(comments) {
 /**
  * Called when user clicks "Submit All Answers"
  * Gather up the responses and send them back to your Power Automate flow
+ * which updates the corresponding SharePoint rows with the response details.
  */
 function handleSubmitAll() {
   // We'll assume we've already fetched comments. If we store them globally or re-fetch them:
@@ -195,8 +196,8 @@ function handleSubmitAll() {
     .then((res) => res.json())
     .then((allData) => {
       // allData is { DocumentID, Comments }
-      // Filter again by current doc ID
       const documentId = getDocumentIdFromUrl();
+      // Filter comments for this DocumentID
       const commentsForDoc = allData.Comments.filter(
         (c) => c.DocumentID === documentId
       );
@@ -209,19 +210,26 @@ function handleSubmitAll() {
         commentsForDoc[idx].response = textVal;
       });
 
-      // Build final data payload
+      // Build final data payload including additional response details.
+      // NOTE: Replace "Reviewer Name" with an actual value if available.
       const payload = {
         DocumentID: documentId,
         Comments: commentsForDoc.map((c) => ({
           CommentID: c.CommentID,
-          ResponseText: c.response || ""
+          // Response details being sent to update SharePoint:
+          ResponseText: c.response || "",
+          ResponseAuthor: "Reviewer Name", // Replace with dynamic reviewer info if available.
+          ResponseDateTime: new Date().toISOString(),
+          ResponseTextID: c.TextID, // Or use a new value if needed.
+          ResponseTextHighlight: c.TextHighlight, // Adjust if you want different formatting.
+          ResponseFullText: c.FullText // Or build an HTML string if required.
         }))
       };
 
       console.log("Submitting data to Power Automate:", payload);
 
-      // POST to your Power Automate endpoint
-      fetch("https://your-power-automate-endpoint.com", {
+      // POST to your Power Automate endpoint that handles updating the SharePoint list.
+      fetch("https://your-power-automate-endpoint-for-updating.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -230,7 +238,7 @@ function handleSubmitAll() {
           alert("Responses submitted successfully!");
         })
         .catch((err) => {
-          console.error("Error submitting:", err);
+          console.error("Error submitting responses:", err);
           alert("An error occurred while submitting responses.");
         });
     })
