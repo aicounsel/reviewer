@@ -30,6 +30,7 @@ header {
 .logo-and-title {
   display: flex;
   align-items: center;
+  width: 100px
   gap: 1em;
 }
 #progress-bar-container {
