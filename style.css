@@ -1,215 +1,131 @@
-/* Basic Reset */
+/* Resets and basic styling */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
-
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #f9f9f9;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9; /* Slight gray background to match minimal style */
   color: #333;
 }
-
-/* OPTIONAL Password Overlay */
-#passwordOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
+header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-#passwordModal {
-  background: #fff;
-  padding: 1.5em;
-  border-radius: 8px;
-  text-align: center;
-  min-width: 300px;
-}
-
-/* Hide main container if using password gating (show only after successful password).
-   You can also do this in JS if you prefer. */
-#mainContainer {
-  display: block; /* or none if you want to hide by default */
-  width: 100%;
-  height: 100%;
-}
-
-/* Top Bar */
-#topBar {
-  display: flex;
-  align-items: center;
+  padding: 10px;
   background: #ffffff;
-  padding: 1em;
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #ccc;
+}
+.logo img {
+  height: 40px;
 }
 
-#logoContainer {
-  flex: 0 0 auto;
-  margin-right: 2em;
-}
-
-#logoContainer img {
-  max-height: 40px;
-}
-
-/* Progress Bar container */
-#progressBar {
-  flex: 1;
+/* Progress bar container */
+#progressBarContainer {
+  margin-left: 20px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  margin: 0 1em;
 }
 
-/* We'll inject 'diamonds' or steps dynamically in JS. 
-   But let's define a style for them. */
-.progress-step {
+/* Example diamond style for progress steps */
+.step {
   width: 30px;
   height: 30px;
+  margin: 0 5px;
   transform: rotate(45deg);
-  background: gray;
-  margin-right: 10px;
-  display: inline-flex;
+  background-color: gray;
+  display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: white;
   font-weight: bold;
+  cursor: pointer;
+}
+.step span {
+  transform: rotate(-45deg);
   font-size: 14px;
-  transition: background 0.3s;
 }
 
-/* A small line or connector between steps */
-.progress-connector {
-  width: 40px;
-  height: 4px;
-  background: gray;
-  margin-right: 10px;
-  display: inline-block;
-  vertical-align: middle;
-  transition: background 0.3s;
-}
-
-/* Example color states for the steps/connector */
-.step-yellow {
-  background: #f6c343 !important; /* a shade of yellow */
-}
-
-.step-blue {
-  background: #3498db !important; /* a shade of blue */
-}
-
-/* Content Container: left and right panels */
-#contentContainer {
+/* Panel layout (split screen) */
+main {
   display: flex;
-  height: calc(100vh - 80px); /* subtract header height */
-  overflow: hidden;
+}
+.panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto; /* If content is tall, it can scroll */
+  height: calc(100vh - 80px); /* Adjust for header/footer height */
+}
+.left-panel {
+  background: #ffffff;
+  border-right: 1px solid #ccc;
+}
+.right-panel {
+  background: #f5f5f5;
 }
 
-/* Left side: Document container */
-#documentContainer {
-  flex: 1 1 auto;
-  border-right: 1px solid #e0e0e0;
-  overflow-y: auto;
-  position: relative;
-}
-
-/* The iframe that displays the actual cleaned doc */
-#documentFrame {
+/* Iframe style */
+#docIframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* Right side: Comments container */
-#commentsContainer {
-  width: 400px;
-  max-width: 400px;
-  background: #fff;
-  padding: 1em;
-  overflow-y: auto;
-}
-
-/* Individual comment item */
+/* Comments section */
 .comment-item {
-  background: #fafafa;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 1em;
-  margin-bottom: 1em;
+  background: #fff;
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #ccc;
 }
-
-.comment-header {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.comment-item:hover {
+  border-left-color: #999;
 }
-
+.comment-metadata {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 5px;
+}
 .comment-text {
-  margin-bottom: 0.5em;
-  font-size: 0.95rem;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
-
-.comment-response {
-  margin-top: 0.5em;
+.response-area {
+  margin-top: 10px;
 }
-
-.comment-response textarea {
+.response-area textarea {
   width: 100%;
-  height: 60px;
-  resize: vertical;
-  margin-bottom: 0.5em;
-  font-family: inherit;
-  font-size: 0.95rem;
+  min-height: 60px;
 }
 
-.comment-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.mark-complete-btn {
-  background: #eee;
-  padding: 0.5em 1em;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.mark-complete-btn:hover {
-  background: #ddd;
-}
-
-/* Submit all button at the bottom */
-#submitContainer {
-  margin-top: 1em;
-  text-align: center;
-}
-
-#submitAll {
-  background: #3498db;
+/* Button style */
+button {
+  background: #007bff;
   color: #fff;
   border: none;
-  padding: 0.75em 1.5em;
-  cursor: pointer;
+  padding: 10px 14px;
   border-radius: 4px;
-  font-size: 1rem;
+  cursor: pointer;
+}
+button:hover {
+  opacity: 0.9;
 }
 
-#submitAll:hover {
-  background: #2980b9;
+/* Progress bar color states: .gray, .yellow, .blue */
+.step.gray {
+  background-color: gray;
+}
+.step.yellow {
+  background-color: gold;
+}
+.step.blue {
+  background-color: #007bff;
 }
 
-/* Simple highlight effect in the document (if you want to highlight the text anchor). 
-   We'll add/remove this class in script.js */
-.highlighted-text {
-  background: yellow;
+/* Footer */
+footer {
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background: #fff;
+  text-align: right;
 }
