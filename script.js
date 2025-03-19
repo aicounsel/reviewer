@@ -1,11 +1,11 @@
-
 /*************************************************
  * script.js 
  * Skeleton for the reviewer portal logic
  *************************************************/
 
-// Mock endpoint for comments (replace with your Power Automate JSON URL)
-const COMMENTS_URL = "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
+// Power Automate endpoint for fetching comments
+const COMMENTS_URL =
+  "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
 
 /**
  * On page load, do the following:
@@ -22,41 +22,36 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Set the iframe source to the matching .html in /agreements
+  // 1. Set the iframe source to the matching .html in /agreements
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
 
-// Set the iframe to highlight
-const docIframe = document.getElementById("docIframe");
-
-  // Wait until the iframe finishes loading
+  // 2. Once the iframe finishes loading, inject CSS for .highlighted-text
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
-      // Inject the CSS for .highlighted-text
       injectHighlightStyle(iframeDoc);
     }
   });
-  
-  // Fetch comments JSON
-fetch(COMMENTS_URL, {
-  method: "POST", // since your flow uses an HTTP POST trigger
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ DocumentID: documentId })
-})
-  .then((res) => res.json())
-  .then((data) => {
-    // data now contains { DocumentID, Comments }
-    const commentsForDoc = data.Comments;
-    renderProgressBar(commentsForDoc);
-    renderComments(commentsForDoc);
+
+  // 3. Fetch comments from Power Automate
+  fetch(COMMENTS_URL, {
+    method: "POST", // since your flow uses an HTTP POST trigger
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ DocumentID: documentId })
   })
-  .catch((err) => {
-    console.error("Error fetching comments:", err);
-  });
+    .then((res) => res.json())
+    .then((data) => {
+      // data now contains { DocumentID, Comments }
+      const commentsForDoc = data.Comments || [];
+      renderProgressBar(commentsForDoc);
+      renderComments(commentsForDoc);
+    })
+    .catch((err) => {
+      console.error("Error fetching comments:", err);
+    });
 
-
-  // Set up "Submit All" button
+  // 4. Set up "Submit All" button
   document
     .getElementById("submitAllBtn")
     .addEventListener("click", handleSubmitAll);
@@ -68,6 +63,22 @@ fetch(COMMENTS_URL, {
 function getDocumentIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("documentId");
+}
+
+/**
+ * Highlight: Inject the style needed for .highlighted-text into the iframe
+ */
+function injectHighlightStyle(iframeDoc) {
+  // Create a <style> node
+  const styleEl = iframeDoc.createElement("style");
+  styleEl.textContent = `
+    .highlighted-text {
+      background-color: yellow;
+      transition: background-color 0.3s ease;
+    }
+  `;
+  // Append to the <head> of the iframe
+  iframeDoc.head.appendChild(styleEl);
 }
 
 /**
@@ -94,22 +105,6 @@ function renderProgressBar(comments) {
     comment.stepElement = stepDiv;
   });
 }
-/**
- * Highlight
- */
-function injectHighlightStyle(iframeDoc) {
-  // Create a <style> node
-  const styleEl = iframeDoc.createElement("style");
-  styleEl.textContent = `
-    .highlighted-text {
-      background-color: yellow;
-      transition: background-color 0.3s ease;
-    }
-  `;
-  // Append to the <head> of the iframe
-  iframeDoc.head.appendChild(styleEl);
-}
-
 
 /**
  * Render comments in #commentContainer
@@ -198,16 +193,15 @@ function handleSubmitAll() {
   // We'll assume we've already fetched comments. If we store them globally or re-fetch them:
   fetch(COMMENTS_URL)
     .then((res) => res.json())
-    .then((allComments) => {
+    .then((allData) => {
+      // allData is { DocumentID, Comments }
       // Filter again by current doc ID
       const documentId = getDocumentIdFromUrl();
-      const commentsForDoc = allComments.filter(
+      const commentsForDoc = allData.Comments.filter(
         (c) => c.DocumentID === documentId
       );
 
-      // Collect the responses from the DOM or from the comment objects
-      // In this simple example, we didn't store them globally,
-      // so we might need a better approach. For the skeleton:
+      // Collect the responses from the DOM
       const commentItems = document.querySelectorAll(".comment-item");
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
@@ -239,6 +233,9 @@ function handleSubmitAll() {
           console.error("Error submitting:", err);
           alert("An error occurred while submitting responses.");
         });
+    })
+    .catch((err) => {
+      console.error("Error in handleSubmitAll fetch:", err);
     });
 }
 
@@ -257,13 +254,9 @@ function highlightDocumentText(textID, highlight) {
   if (!anchor) return;
 
   if (highlight) {
-    // Add the CSS class
     anchor.classList.add("highlighted-text");
-    // Scroll into view if desired
     anchor.scrollIntoView({ behavior: "smooth", block: "center" });
   } else {
     anchor.classList.remove("highlighted-text");
   }
-}
- 
 }
