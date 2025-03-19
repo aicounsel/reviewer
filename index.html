@@ -1,42 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Client Review Portal</title>
-  <!-- Link to external CSS file -->
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Document Reviewer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="container">
-    <!-- Document Display Section (Left) -->
-    <div id="document">
-      <!-- The iframe loads your updated HTML document from GitHub Pages -->
-      <iframe id="docFrame" src="https://aicounsel.github.io/reviewer/client-document.html" style="width:100%; height:100%; border:none;"></iframe>
-    </div>
-    <!-- Q&A Panel Section (Right) -->
-    <div id="qa-panel">
-      <h2>Review Comments</h2>
-      
-      <!-- Each comment block represents a review comment.
-           The data-anchor attribute corresponds to the anchor in the document (e.g., <a name="_cmntref2">) -->
-      <div class="comment-block" data-anchor="_cmntref1">
-        <div class="comment-text">What are the fees going to be based on?</div>
-        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+  <div id="app">
+    <!-- Header & Progress Bar -->
+    <header>
+      <div class="logo-and-title">
+        <!-- Replace with your own logo or text -->
+        <img src="https://via.placeholder.com/100x40?text=My+Logo" alt="Logo" />
+        <h1>Document Reviewer</h1>
       </div>
-      <div class="comment-block" data-anchor="_cmntref2">
-        <div class="comment-text">What proposal? Attached?</div>
-        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+      <div id="progress-bar-container">
+        <!-- Dynamically populated by script.js -->
+        <div id="progress-bar"></div>
       </div>
-      <div class="comment-block" data-anchor="_cmntref3">
-        <div class="comment-text">This is too vague.</div>
-        <textarea class="response-field" placeholder="Enter your response here"></textarea>
+    </header>
+
+    <!-- Main area: Document on left, Comments on right -->
+    <main>
+      <div id="document-pane">
+        <!-- We load the actual HTML doc in an iframe or via direct injection -->
+        <iframe id="doc-iframe" src="" frameborder="0"></iframe>
       </div>
-      
-      <button class="submit-btn" onclick="submitResponses()">Submit Responses</button>
-    </div>
+
+      <div id="comments-pane">
+        <h2>Comments</h2>
+        <div id="comments-list">
+          <!-- Populated by JS with comment boxes -->
+        </div>
+        <button id="submit-all-btn">Submit All Answers</button>
+      </div>
+    </main>
   </div>
-  
-  <!-- Link to external JavaScript file -->
+
   <script src="script.js"></script>
 </body>
 </html>
