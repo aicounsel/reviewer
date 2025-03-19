@@ -1,3 +1,4 @@
+
 /*************************************************
  * script.js 
  * Skeleton for the reviewer portal logic
@@ -127,7 +128,7 @@ function renderComments(comments) {
       }
 
       // Highlight the text in the iframe if possible
-      highlightDocumentText(comment.TextHighlight, true);
+      highlightDocumentText(comment.TextID, true);
     });
 
     // When the user blurs the textarea
@@ -141,7 +142,7 @@ function renderComments(comments) {
         }
       }
       // Remove highlight
-      highlightDocumentText(comment.TextHighlight, false);
+      highlightDocumentText(comment.TextID, false);
     });
 
     // On "Mark as Complete"
