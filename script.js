@@ -230,11 +230,14 @@ function highlightDocumentText(textID, highlight) {
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
 
+  
   if (highlight) {
-    anchor.classList.add("highlighted-text");
-    // Also scroll it into view
-    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
-  } else {
-    anchor.classList.remove("highlighted-text");
-  }
+  anchor.style.backgroundColor = 'yellow';
+} else {
+  anchor.style.backgroundColor = '';
+}
+
+
+
+ 
 }
