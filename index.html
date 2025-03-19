@@ -2,41 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Document Reviewer</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- 
+    If you have a favicon or any meta tags related to your branding, place them here.
+  -->
 </head>
 <body>
-  <div id="app">
-    <!-- Header & Progress Bar -->
-    <header>
-      <div class="logo-and-title">
-        <!-- Replace with your own logo or text -->
-        <img src="https://raw.githubusercontent.com/aicounsel/reviewer/refs/heads/main/AI%20Counsel%20Client%20Assistant%20Logo.png" alt="Logo" />
-        <h1>Document Reviewer</h1>
+
+  <!-- ====================================
+       OPTIONAL Password Protection Overlay
+       ====================================
+       Uncomment and modify if you want a simple front-end password gate.
+  -->
+  <!--
+  <div id="passwordOverlay">
+    <div id="passwordModal">
+      <h2>Enter Password</h2>
+      <input type="password" id="passwordInput" />
+      <button id="passwordSubmit">Submit</button>
+      <p id="passwordError" style="color: red; display: none;">
+        Incorrect password. Please try again.
+      </p>
+    </div>
+  </div>
+  -->
+
+  <!-- ====================================
+       Main Container
+       ====================================
+       This container is hidden by default (CSS or JS) if we use password gating.
+  -->
+  <div id="mainContainer">
+    <!-- Top bar with logo and progress bar -->
+    <header id="topBar">
+      <div id="logoContainer">
+        <!-- Placeholder for your logo -->
+        <img src="https://via.placeholder.com/120x40?text=LOGO" alt="Company Logo">
       </div>
-      <div id="progress-bar-container">
-        <!-- Dynamically populated by script.js -->
-        <div id="progress-bar"></div>
-      </div>
+      <div id="progressBar"></div>
     </header>
 
-    <!-- Main area: Document on left, Comments on right -->
-    <main>
-      <div id="document-pane">
-        <!-- We load the actual HTML doc in an iframe or via direct injection -->
-        <iframe id="doc-iframe" src="" frameborder="0"></iframe>
+    <!-- Main content split: left for document, right for comments -->
+    <div id="contentContainer">
+      <!-- Left: Document display -->
+      <div id="documentContainer">
+        <!-- The cleaned HTML file from /agreements/<DocumentID>.html 
+             will be injected or loaded here (e.g. via an iframe or direct fetch).
+        -->
+        <iframe id="documentFrame" src="" frameborder="0"></iframe>
       </div>
 
-      <div id="comments-pane">
+      <!-- Right: Comments and responses -->
+      <div id="commentsContainer">
         <h2>Comments</h2>
-        <div id="comments-list">
-          <!-- Populated by JS with comment boxes -->
+        <div id="commentsList">
+          <!-- Dynamically populated by JavaScript -->
         </div>
-        <button id="submit-all-btn">Submit All Answers</button>
+
+        <!-- Submit all answers at the bottom -->
+        <div id="submitContainer">
+          <button id="submitAll">Submit All Answers</button>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 
+  <!-- Our main JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
