@@ -2,75 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Document Reviewer</title>
+  <title>Reviewer Portal</title>
+  <!-- Link your stylesheet -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- 
-    If you have a favicon or any meta tags related to your branding, place them here.
-  -->
+  <!-- Load your main script (use `defer` so it executes after DOM loads) -->
+  <script src="script.js" defer></script>
 </head>
 <body>
 
-  <!-- ====================================
-       OPTIONAL Password Protection Overlay
-       ====================================
-       Uncomment and modify if you want a simple front-end password gate.
-  -->
-  <!--
-  <div id="passwordOverlay">
-    <div id="passwordModal">
-      <h2>Enter Password</h2>
-      <input type="password" id="passwordInput" />
-      <button id="passwordSubmit">Submit</button>
-      <p id="passwordError" style="color: red; display: none;">
-        Incorrect password. Please try again.
-      </p>
+  <!-- Header area: Logo + Progress Bar -->
+  <header>
+    <div class="logo">
+      <!-- Place your logo image here -->
+      <img src="your-logo.png" alt="Logo" />
     </div>
-  </div>
-  -->
-
-  <!-- ====================================
-       Main Container
-       ====================================
-       This container is hidden by default (CSS or JS) if we use password gating.
-  -->
-  <div id="mainContainer">
-    <!-- Top bar with logo and progress bar -->
-    <header id="topBar">
-      <div id="logoContainer">
-        <!-- Placeholder for your logo -->
-        <img src="https://via.placeholder.com/120x40?text=LOGO" alt="Company Logo">
-      </div>
-      <div id="progressBar"></div>
-    </header>
-
-    <!-- Main content split: left for document, right for comments -->
-    <div id="contentContainer">
-      <!-- Left: Document display -->
-      <div id="documentContainer">
-        <!-- The cleaned HTML file from /agreements/<DocumentID>.html 
-             will be injected or loaded here (e.g. via an iframe or direct fetch).
-        -->
-        <iframe id="documentFrame" src="" frameborder="0"></iframe>
-      </div>
-
-      <!-- Right: Comments and responses -->
-      <div id="commentsContainer">
-        <h2>Comments</h2>
-        <div id="commentsList">
-          <!-- Dynamically populated by JavaScript -->
-        </div>
-
-        <!-- Submit all answers at the bottom -->
-        <div id="submitContainer">
-          <button id="submitAll">Submit All Answers</button>
-        </div>
-      </div>
+    <div id="progressBarContainer">
+      <!-- The progress bar segments will be injected by script.js -->
     </div>
-  </div>
+  </header>
 
-  <!-- Our main JavaScript -->
-  <script src="script.js"></script>
+  <!-- Main container: left side = document, right side = comment panel -->
+  <main>
+    <!-- Left panel: will load the cleaned HTML doc from /agreements/<DocumentID>.html -->
+    <section id="documentContainer" class="panel left-panel">
+      <!-- The script can dynamically load or inject the HTML content here, 
+           or you can embed an <iframe> with the correct src. Example: -->
+      <iframe id="docIframe" src="" frameborder="0"></iframe>
+    </section>
+
+    <!-- Right panel: list of comments + responses -->
+    <section id="commentContainer" class="panel right-panel">
+      <!-- The script will inject comment items here -->
+    </section>
+  </main>
+
+  <!-- Footer with a "Submit All" button (optional location) -->
+  <footer>
+    <button id="submitAllBtn">Submit All Answers</button>
+  </footer>
+
 </body>
 </html>
