@@ -127,7 +127,7 @@ function renderComments(comments) {
       }
 
       // Highlight the text in the iframe if possible
-      highlightDocumentText(comment.TextID, true);
+      highlightDocumentText(comment.TextHighlight, true);
     });
 
     // When the user blurs the textarea
@@ -141,7 +141,7 @@ function renderComments(comments) {
         }
       }
       // Remove highlight
-      highlightDocumentText(comment.TextID, false);
+      highlightDocumentText(comment.TextHighlight, false);
     });
 
     // On "Mark as Complete"
