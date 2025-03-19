@@ -1,225 +1,373 @@
-/*************************************************************
-  On page load, we:
-   1) Parse the DocumentID from the URL.
-   2) Set the iframe source to load the corresponding .html in /agreements/.
-   3) Fetch the comments JSON and filter by DocumentID.
-   4) Render the progress bar and comments list.
-   5) Handle highlight logic and “mark as complete” logic.
-**************************************************************/
+/***************************************************
+ * script.js
+ ***************************************************/
 
-document.addEventListener("DOMContentLoaded", () => {
-  // 1) Get Document ID from URL ?documentId=...
+// =====================================
+// 1. Optional Password Gate
+// =====================================
+const correctPassword = "mySecretPassword"; // Obviously store more securely if possible
+
+function setupPasswordGate() {
+  const overlay = document.getElementById("passwordOverlay");
+  const mainContainer = document.getElementById("mainContainer");
+  const passwordInput = document.getElementById("passwordInput");
+  const passwordSubmit = document.getElementById("passwordSubmit");
+  const passwordError = document.getElementById("passwordError");
+
+  if (!overlay || !passwordInput || !passwordSubmit) {
+    // If we don't have these elements, maybe we skip password gating
+    return;
+  }
+
+  // By default, hide the main container (in style.css or here)
+  mainContainer.style.display = "none";
+
+  passwordSubmit.addEventListener("click", () => {
+    if (passwordInput.value === correctPassword) {
+      // Correct password
+      overlay.style.display = "none";
+      mainContainer.style.display = "block";
+    } else {
+      // Wrong password
+      passwordError.style.display = "block";
+    }
+  });
+}
+
+// =====================================
+// 2. Utility: Get Document ID from URL
+// =====================================
+function getDocumentID() {
+  // Example: ?documentId=firstlastcliente-1986b709-7f46-4c71-a03d-4ab8b924ea68
+  // or you might parse from window.location.pathname if you prefer.
   const urlParams = new URLSearchParams(window.location.search);
-  const docId = urlParams.get("documentId") || "defaultDocId"; 
-  // If you prefer the docId to come from the actual path, parse window.location.pathname instead.
+  const docId = urlParams.get("documentId");
+  return docId;
+}
 
-  // 2) Load the corresponding .html in the iframe
-  const iframe = document.getElementById("doc-iframe");
-  iframe.src = `agreements/${docId}.html`;
+// =====================================
+// 3. Load the Document in the Left Panel
+// =====================================
+function loadDocument(docId) {
+  const iframe = document.getElementById("documentFrame");
+  if (!iframe) return;
 
-  // 3) Fetch comments JSON & filter
-  fetch("comments.json") // Adjust path if needed
-    .then(response => response.json())
-    .then(allComments => {
-      // Filter for those that match the docId
-      const docComments = allComments.filter(c => c.DocumentID === docId);
+  // Construct the path to the HTML file
+  // e.g. /agreements/<DocumentID>.html
+  if (docId) {
+    iframe.src = `agreements/${docId}.html`;
+  } else {
+    // If no docId, maybe show an error or a default page
+    iframe.src = `agreements/default.html`;
+  }
+}
 
-      // If no comments found, handle gracefully
-      if (docComments.length === 0) {
-        console.log("No comments found for this DocumentID.");
-      }
-
-      // 4) Render the progress bar & comments list
-      renderProgressBar(docComments.length);
-      renderCommentsList(docComments);
-
-      // Listen for Submit All
-      const submitAllBtn = document.getElementById("submit-all-btn");
-      submitAllBtn.addEventListener("click", () => {
-        handleSubmitAll(docId, docComments);
-      });
+// =====================================
+// 4. Fetch Comments Data
+// =====================================
+// For simplicity, we fetch a local JSON file. 
+// In reality, you'd fetch from Power Automate or a live endpoint.
+function fetchCommentsJSON() {
+  // Replace 'comments.json' with your real endpoint.
+  return fetch("comments.json")
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to load comments JSON");
+      return res.json();
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("Error fetching comments:", err);
+      return [];
     });
-});
+}
 
-/*************************************************************
-  Render a simple progress bar with N “segments” (diamonds or squares).
-  For demonstration, let's just add <span> elements for each step.
-**************************************************************/
+// =====================================
+// 5. Render Progress Bar & Comments
+// =====================================
+
+// We'll store comment data in memory for easy referencing
+let commentsData = [];
+
+// For the dynamic progress bar, we'll store each step's element references
+const progressBarSteps = [];
+
+/**
+ * Render the progress bar based on the number of comments.
+ */
 function renderProgressBar(numComments) {
-  const progressBar = document.getElementById("progress-bar");
-  progressBar.innerHTML = ""; // Clear any existing
+  const progressBar = document.getElementById("progressBar");
+  if (!progressBar) return;
+
+  // Clear existing content if any
+  progressBar.innerHTML = "";
 
   for (let i = 0; i < numComments; i++) {
-    const stepEl = document.createElement("span");
+    // Create the diamond shape
+    const stepEl = document.createElement("div");
     stepEl.classList.add("progress-step");
-    stepEl.textContent = i + 1;
-    // We can style it as a diamond via CSS transform, or keep it simple
-    stepEl.style.display = "inline-block";
-    stepEl.style.width = "20px";
-    stepEl.style.height = "20px";
-    stepEl.style.lineHeight = "20px";
-    stepEl.style.textAlign = "center";
-    stepEl.style.marginRight = "8px";
-    stepEl.style.backgroundColor = "#ccc";
-    stepEl.style.color = "#fff";
-    stepEl.style.borderRadius = "3px";
-    stepEl.style.transform = "rotate(45deg)";
-    stepEl.style.cursor = "pointer";
+    stepEl.textContent = i + 1; // label = 1,2,3,...
 
+    // Keep track of this step in an array so we can update colors later
+    progressBarSteps.push(stepEl);
+
+    // Add step to the DOM
     progressBar.appendChild(stepEl);
 
-    // Optional: add a line or arrow between steps
+    // If not the last step, add a connector line
     if (i < numComments - 1) {
-      const connector = document.createElement("span");
-      connector.textContent = "---";
-      connector.style.marginRight = "8px";
+      const connector = document.createElement("div");
+      connector.classList.add("progress-connector");
       progressBar.appendChild(connector);
+      progressBarSteps.push(connector);
     }
   }
 }
 
-/*************************************************************
-  Render the comments list on the right pane.
-  We'll maintain an internal array to track each comment's status:
-    - "notTouched"
-    - "inProgress"
-    - "complete"
-**************************************************************/
-function renderCommentsList(comments) {
-  const commentsList = document.getElementById("comments-list");
+/**
+ * Render the comments list on the right panel
+ */
+function renderCommentsList(filteredComments) {
+  const commentsList = document.getElementById("commentsList");
+  if (!commentsList) return;
+
+  // Clear out existing
   commentsList.innerHTML = "";
 
-  comments.forEach((comment, index) => {
-    // Create a container for each comment
-    const commentEl = document.createElement("div");
-    commentEl.classList.add("comment-item");
+  filteredComments.forEach((comment, index) => {
+    // Create the comment container
+    const commentItem = document.createElement("div");
+    commentItem.classList.add("comment-item");
 
-    // Comment metadata header
-    const header = document.createElement("header");
-    header.textContent = `Comment #${index + 1} | ${comment.CommentAuthor} | ${comment.CommentDateTime}`;
-    commentEl.appendChild(header);
+    // Comment header (ID, Author, Date)
+    const headerDiv = document.createElement("div");
+    headerDiv.classList.add("comment-header");
 
-    // Actual comment text
-    const commentTextP = document.createElement("p");
-    commentTextP.classList.add("comment-text");
-    commentTextP.textContent = comment.CommentText;
-    commentEl.appendChild(commentTextP);
+    const leftHeader = document.createElement("span");
+    leftHeader.textContent = `ID: ${comment.CommentID}`;
 
-    // Response textarea
-    const responseArea = document.createElement("textarea");
-    responseArea.classList.add("response-area");
-    responseArea.placeholder = "Write your response here...";
-    commentEl.appendChild(responseArea);
+    const rightHeader = document.createElement("span");
+    rightHeader.textContent = comment.CommentDateTime; // e.g., "3/15/2025 03:50 PM"
 
-    // Mark Complete button
+    headerDiv.appendChild(leftHeader);
+    headerDiv.appendChild(rightHeader);
+
+    // Comment text
+    const commentTextDiv = document.createElement("div");
+    commentTextDiv.classList.add("comment-text");
+    commentTextDiv.textContent = comment.CommentText;
+
+    // Author line (optional)
+    const authorDiv = document.createElement("div");
+    authorDiv.style.fontStyle = "italic";
+    authorDiv.textContent = `By: ${comment.CommentAuthor}`;
+
+    // Response area
+    const responseDiv = document.createElement("div");
+    responseDiv.classList.add("comment-response");
+
+    const textarea = document.createElement("textarea");
+    textarea.placeholder = "Type your response here...";
+
+    // Keep track of the response in our data array
+    // so we don't have to fish it out of the DOM later.
+    // We'll store it in the comment object itself.
+    textarea.addEventListener("input", () => {
+      comment.responseText = textarea.value;
+      // If user is typing, let's highlight the progress step in yellow
+      updateProgressBarStep(index, "yellow");
+    });
+
+    responseDiv.appendChild(textarea);
+
+    // Mark as complete
+    const actionsDiv = document.createElement("div");
+    actionsDiv.classList.add("comment-actions");
+
     const completeBtn = document.createElement("button");
-    completeBtn.classList.add("mark-complete-btn");
     completeBtn.textContent = "Mark as Complete";
-    commentEl.appendChild(completeBtn);
-
-    // Append to list
-    commentsList.appendChild(commentEl);
-
-    // Track status in an attribute or in memory
-    let status = "notTouched";
-
-    // PROGRESS BAR ELEM
-    const progressStep = document.querySelectorAll(".progress-step")[index];
-
-    // Events:
-    // 1) Focus in => highlight doc text, turn step "yellow"
-    responseArea.addEventListener("focus", () => {
-      if (status === "notTouched") {
-        status = "inProgress";
-        progressStep.style.backgroundColor = "yellow";
-      }
-      highlightDocumentText(comment.TextID, true);
-    });
-
-    // 2) Blur => if no text is present, revert to "notTouched", else remain "inProgress"
-    responseArea.addEventListener("blur", () => {
-      highlightDocumentText(comment.TextID, false);
-      if (!responseArea.value.trim() && status !== "complete") {
-        status = "notTouched";
-        progressStep.style.backgroundColor = "#ccc";
-      }
-    });
-
-    // 3) Mark Complete => set status to "complete", step to "blue"
+    completeBtn.classList.add("mark-complete-btn");
     completeBtn.addEventListener("click", () => {
-      status = "complete";
-      progressStep.style.backgroundColor = "#007bff";
+      // If there's a response, we'll consider it complete
+      if (comment.responseText && comment.responseText.trim().length > 0) {
+        comment.isComplete = true;
+        // Update the progress bar for this comment
+        updateProgressBarStep(index, "blue");
+      } else {
+        // If there's no response, revert to grey or show an alert
+        alert("Please enter a response before marking complete.");
+      }
     });
+
+    actionsDiv.appendChild(completeBtn);
+
+    // Attach highlight/scroll logic
+    // On focus of the textarea, highlight the relevant text in the left doc
+    textarea.addEventListener("focus", () => {
+      highlightDocumentText(comment.TextID, true);
+      // Also highlight the progress step in yellow (if not completed)
+      if (!comment.isComplete) {
+        updateProgressBarStep(index, "yellow");
+      }
+    });
+    // On blur, remove highlight if not completed
+    textarea.addEventListener("blur", () => {
+      highlightDocumentText(comment.TextID, false);
+      if (!comment.isComplete) {
+        // revert to grey or check if user typed something
+        if (comment.responseText && comment.responseText.trim().length > 0) {
+          // user typed something but hasn't marked complete => stay yellow or revert?
+          // For this example, let's revert to grey if they're not actively focused
+          updateProgressBarStep(index, "grey");
+        } else {
+          updateProgressBarStep(index, "grey");
+        }
+      }
+    });
+
+    // Append everything to commentItem
+    commentItem.appendChild(headerDiv);
+    commentItem.appendChild(commentTextDiv);
+    commentItem.appendChild(authorDiv);
+    commentItem.appendChild(responseDiv);
+    commentItem.appendChild(actionsDiv);
+
+    // Finally, append to the list
+    commentsList.appendChild(commentItem);
   });
 }
 
-/*************************************************************
-  Highlight or un-highlight the relevant text in the document.
-  This depends on whether you can access the iframe’s DOM.
-**************************************************************/
-function highlightDocumentText(textID, shouldHighlight) {
-  // Attempt to highlight in the iframe
-  const iframe = document.getElementById("doc-iframe");
-  const doc = iframe.contentWindow.document; // same-domain only
+// =====================================
+// 6. Progress Bar Coloring
+// =====================================
+function updateProgressBarStep(stepIndex, colorState) {
+  // Each step has a diamond and possibly a connector after it,
+  // so we need to map index -> 2*index for the diamond, 2*index+1 for the connector
+  // Example:
+  //  stepIndex=0 => diamond @0, connector @1
+  //  stepIndex=1 => diamond @2, connector @3
+  // etc.
 
-  if (!doc) return;
+  const diamondPos = stepIndex * 2; 
+  const connectorPos = stepIndex * 2 + 1;
 
-  // Find the anchor or element with name=textID
-  const anchor = doc.querySelector(`a[name="${textID}"]`) || doc.getElementById(textID);
-  if (!anchor) return;
+  const validDiam = progressBarSteps[diamondPos];
+  const validConn = progressBarSteps[connectorPos];
 
-  if (shouldHighlight) {
-    anchor.classList.add("highlighted-text");
-    // Scroll into view smoothly
-    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
-  } else {
-    anchor.classList.remove("highlighted-text");
+  // Decide color class
+  let backgroundClass = "";
+  switch (colorState) {
+    case "yellow":
+      backgroundClass = "step-yellow";
+      break;
+    case "blue":
+      backgroundClass = "step-blue";
+      break;
+    case "grey":
+    default:
+      backgroundClass = "";
+  }
+
+  // Remove existing color classes
+  if (validDiam) {
+    validDiam.classList.remove("step-yellow", "step-blue");
+    if (backgroundClass) validDiam.classList.add(backgroundClass);
+  }
+  if (validConn) {
+    validConn.classList.remove("step-yellow", "step-blue");
+    if (backgroundClass) validConn.classList.add(backgroundClass);
   }
 }
 
-/*************************************************************
-  Handle "Submit All" -> gather all responses & send to Power Automate
-**************************************************************/
-function handleSubmitAll(docId, comments) {
-  // Build a data object
-  const payload = {
-    DocumentID: docId,
-    Comments: []
-  };
+// =====================================
+// 7. Highlighting & Scrolling
+// =====================================
+function highlightDocumentText(textID, shouldHighlight) {
+  // Access the iframe document to find the anchor or span
+  const iframe = document.getElementById("documentFrame");
+  if (!iframe) return;
 
-  // Grab the textareas from the DOM
-  const commentEls = document.querySelectorAll(".comment-item");
-  commentEls.forEach((item, index) => {
-    const textarea = item.querySelector("textarea");
-    const responseText = textarea.value.trim();
-    const commentID = comments[index].CommentID;
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+  if (!iframeDoc) return;
 
-    payload.Comments.push({
-      CommentID: commentID,
-      ResponseText: responseText
-    });
-  });
+  // Find the anchor with name=textID or an element with id=textID
+  const anchorEl = iframeDoc.querySelector(`a[name="${textID}"]`) || iframeDoc.getElementById(textID);
+  if (!anchorEl) return;
 
-  // For demo: just log it. In reality, you'd POST to Power Automate
-  console.log("Final payload:", payload);
+  if (shouldHighlight) {
+    // Scroll into view
+    anchorEl.scrollIntoView({ behavior: "smooth", block: "center" });
 
-  /*
-  fetch("https://your-power-automate-endpoint.com", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(res => res.json())
-  .then(data => {
-    console.log("Submitted successfully:", data);
-    alert("All answers submitted!");
-  })
-  .catch(err => {
-    console.error("Submission error:", err);
-    alert("There was an error submitting your responses.");
-  });
-  */
+    // Add highlight class to the anchor or its children
+    anchorEl.classList.add("highlighted-text");
+    // Or if the text is in a <span> child, you might highlight that specifically.
+    // e.g. anchorEl.querySelector("span").classList.add("highlighted-text");
+  } else {
+    anchorEl.classList.remove("highlighted-text");
+  }
 }
+
+// =====================================
+// 8. Submit All Responses
+// =====================================
+function setupSubmitAllButton() {
+  const submitAllBtn = document.getElementById("submitAll");
+  if (!submitAllBtn) return;
+
+  submitAllBtn.addEventListener("click", () => {
+    // Gather all the responses that are complete or incomplete
+    const dataToSubmit = {
+      DocumentID: getDocumentID() || "unknown-document",
+      Comments: commentsData.map((c) => ({
+        CommentID: c.CommentID,
+        ResponseText: c.responseText || "",
+        IsComplete: !!c.isComplete,
+      })),
+    };
+
+    console.log("Submitting data:", dataToSubmit);
+
+    // Example: Send to Power Automate endpoint
+    fetch("https://your-power-automate-flow-url.com", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dataToSubmit),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error submitting data to Power Automate");
+        alert("All answers submitted successfully!");
+      })
+      .catch((err) => {
+        console.error("Submission error:", err);
+        alert("Something went wrong while submitting.");
+      });
+  });
+}
+
+// =====================================
+// 9. Initialization
+// =====================================
+document.addEventListener("DOMContentLoaded", async () => {
+  // If using password gating, uncomment this
+  // setupPasswordGate();
+
+  // Get Document ID from query string
+  const docId = getDocumentID();
+  // Load the doc into the iframe
+  loadDocument(docId);
+
+  // Retrieve comments from JSON
+  const allComments = await fetchCommentsJSON();
+
+  // Filter for the current doc
+  commentsData = allComments.filter((item) => {
+    return item.DocumentID === docId;
+  });
+
+  // Build the progress bar with the number of comments we found
+  renderProgressBar(commentsData.length);
+
+  // Render the comments list
+  renderCommentsList(commentsData);
+
+  // Set up submission logic
+  setupSubmitAllButton();
+});
