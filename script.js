@@ -249,7 +249,7 @@ function handleSubmitAll() {
       console.log("Submitting data to Power Automate:", payload);
 
       // POST the payload to the update flow.
-      fetch("https://prod-101.westus.logic.azure.com:443/workflows/a89622dede3e4598bf5403e30fedf87b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kD52-8wSlzumCmCs_In5ugvt_cndHeOptsjPyQWHGd0", {
+      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
