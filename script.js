@@ -15,12 +15,34 @@ const COMMENTS_URL =
  */
 document.addEventListener("DOMContentLoaded", () => {
   const documentId = getDocumentIdFromUrl();
-
-  // If you want to handle "no DocumentID" gracefully:
   if (!documentId) {
     alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
     return;
   }
+
+  // Create a container for reviewer info if it doesn't exist.
+  let reviewerInfoDiv = document.getElementById("reviewerInfo");
+  if (!reviewerInfoDiv) {
+    reviewerInfoDiv = document.createElement("div");
+    reviewerInfoDiv.id = "reviewerInfo";
+    // Insert at the top of the body or before the comment container.
+    document.body.insertBefore(reviewerInfoDiv, document.body.firstChild);
+  }
+  
+  // Create label for the input field.
+  const nameLabel = document.createElement("label");
+  nameLabel.textContent = "Your Name: ";
+  nameLabel.setAttribute("for", "reviewerName");
+
+  // Create the input field.
+  const reviewerNameInput = document.createElement("input");
+  reviewerNameInput.id = "reviewerName";
+  reviewerNameInput.type = "text";
+  reviewerNameInput.placeholder = "Enter your name";
+
+  // Append the label and input to the reviewerInfo div.
+  reviewerInfoDiv.appendChild(nameLabel);
+  reviewerInfoDiv.appendChild(reviewerNameInput);
 
   // 1. Set the iframe source to the matching .html in /agreements
   const docIframe = document.getElementById("docIframe");
@@ -190,9 +212,10 @@ function renderComments(comments) {
  * Gather up the responses and send them back to your Power Automate flow
  * which updates the corresponding SharePoint rows with the response details.
  */
-console.log("Submit All Answers clicked.");
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
+
+  // First, fetch the comments data as before.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -200,39 +223,68 @@ function handleSubmitAll() {
   })
     .then((res) => res.json())
     .then((allData) => {
-      // allData is { DocumentID, Comments }
-      // Filter comments for this DocumentID
+      // allData is expected to be an object { DocumentID, Comments }
+      // Filter comments for this document.
       const commentsForDoc = allData.Comments.filter(
         (c) => c.DocumentID === documentId
       );
 
-      // Collect the responses from the DOM
+      // Collect the responses from the DOM.
       const commentItems = document.querySelectorAll(".comment-item");
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
         const textVal = textarea.value.trim();
+        // Add a property 'response' to the corresponding comment object.
         commentsForDoc[idx].response = textVal;
       });
 
-      // Build final data payload including additional response details.
-      // NOTE: Replace "Reviewer Name" with an actual value if available.
+      // Compute the total number of comments.
+      const totalComments = commentsForDoc.length;
+      // Initialize a counter for responses that increments only when a response exists.
+      let responseIndex = 0;
+
+      // Build final payload with response details.
+      // For each comment, if there is a response, compute the ResponseID accordingly.
+      const payloadComments = commentsForDoc.map((c) => {
+        if (c.response && c.response !== "") {
+          // Increment the response counter for each response that exists.
+          responseIndex++;
+          return {
+            CommentID: c.CommentID,
+            // ResponseID is computed as _cmnt followed by (totalComments + current responseIndex).
+            ResponseID: `_cmnt${totalComments + responseIndex}`,
+            ResponseText: c.response,
+            ResponseAuthor: "Reviewer Name", // Replace this with dynamic value if available.
+            ResponseDateTime: new Date().toISOString(),
+            // If you want to compute a new ResponseTextID, you can use similar logic.
+            ResponseTextID: `_cmntref${totalComments + responseIndex}`,
+            // You can adjust these as needed:
+            ResponseTextHighlight: c.TextHighlight,
+            ResponseFullText: c.FullText
+          };
+        } else {
+          // If there's no response, you might still send empty values.
+          return {
+            CommentID: c.CommentID,
+            ResponseID: "",
+            ResponseText: "",
+            ResponseAuthor: "",
+            ResponseDateTime: "",
+            ResponseTextID: "",
+            ResponseTextHighlight: "",
+            ResponseFullText: ""
+          };
+        }
+      });
+
       const payload = {
         DocumentID: documentId,
-        Comments: commentsForDoc.map((c) => ({
-          CommentID: c.CommentID,
-          // Response details being sent to update SharePoint:
-          ResponseText: c.response || "",
-          ResponseAuthor: "Reviewer Name", // Replace with dynamic reviewer info if available.
-          ResponseDateTime: new Date().toISOString(),
-          ResponseTextID: c.TextID, // Or use a new value if needed.
-          ResponseTextHighlight: c.TextHighlight, // Adjust if you want different formatting.
-          ResponseFullText: c.FullText // Or build an HTML string if required.
-        }))
+        Comments: payloadComments
       };
 
       console.log("Submitting data to Power Automate:", payload);
 
-      // POST to your Power Automate endpoint that handles updating the SharePoint list.
+      // Now, send the payload to your update flow.
       fetch("https://prod-101.westus.logic.azure.com:443/workflows/a89622dede3e4598bf5403e30fedf87b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kD52-8wSlzumCmCs_In5ugvt_cndHeOptsjPyQWHGd0", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -250,6 +302,7 @@ function handleSubmitAll() {
       console.error("Error in handleSubmitAll fetch:", err);
     });
 }
+
 
 /**
  * Simple function to highlight (or un-highlight) the text in the loaded iframe
