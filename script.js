@@ -190,6 +190,7 @@ function renderComments(comments) {
  * Gather up the responses and send them back to your Power Automate flow
  * which updates the corresponding SharePoint rows with the response details.
  */
+console.log("Submit All Answers clicked.");
 function handleSubmitAll() {
   // We'll assume we've already fetched comments. If we store them globally or re-fetch them:
   fetch(COMMENTS_URL)
