@@ -9,12 +9,34 @@ body {
   color: #333;
 }
 header {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff; /* White background */
+  z-index: 1000;
   border-bottom: 1px solid #ccc;
+  padding: 10px;
 }
+
+main {
+  margin-top: 80px; /* Adjust based on header height */
+  margin-bottom: 60px; /* Adjust based on footer height */
+}
+
+/* Footer: Fixed at the bottom */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff; /* White background */
+  z-index: 1000;
+  border-top: 1px solid #ccc;
+  padding: 10px;
+  text-align: right;
+}
+
 .logo img {
   height: 40px;
 }
@@ -120,12 +142,4 @@ button:hover {
 }
 .step.blue {
   background-color: #007bff;
-}
-
-/* Footer */
-footer {
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  background: #fff;
-  text-align: right;
 }
