@@ -1,32 +1,85 @@
-/* Resets and basic styling */
+/* Basic reset */
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f9f9f9; /* Slight gray background to match minimal style */
+  background: #f9f9f9;
   color: #333;
 }
+
+/* Fixed Header */
 header {
-  display: flex;
-  align-items: center;
-  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   background: #ffffff;
   border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  z-index: 1000;
+  position: relative;
 }
 .logo img {
   height: 40px;
+  margin-left: 10px;
 }
-
-/* Progress bar container */
+/* Center the progress bar in the header */
 #progressBarContainer {
-  margin-left: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
 }
 
-/* Example diamond style for progress steps */
+/* Fixed Footer */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #ccc;
+  padding: 10px;
+  text-align: right;
+  z-index: 1000;
+}
+
+/* Main content: add top and bottom padding for fixed header/footer */
+main {
+  display: flex;
+  padding-top: 70px;   /* header height + some margin */
+  padding-bottom: 60px; /* footer height */
+  height: calc(100vh - 130px); /* total height minus header/footer */
+}
+
+/* Panels */
+.panel {
+  flex: 1;
+  overflow-y: auto;
+}
+.left-panel {
+  background: #ffffff;
+  border-right: 1px solid #ccc;
+  padding: 10px;  /* Reduced from 20px */
+}
+.right-panel {
+  background: #f5f5f5;
+  padding: 10px;
+}
+
+/* Iframe styling */
+#docIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Progress Bar Steps (diamonds) */
 .step {
   width: 30px;
   height: 30px;
@@ -44,33 +97,17 @@ header {
   transform: rotate(-45deg);
   font-size: 14px;
 }
-
-/* Panel layout (split screen) */
-main {
-  display: flex;
+.step.gray {
+  background-color: gray;
 }
-.panel {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto; /* If content is tall, it can scroll */
-  height: calc(100vh - 80px); /* Adjust for header/footer height */
+.step.yellow {
+  background-color: gold;
 }
-.left-panel {
-  background: #ffffff;
-  border-right: 1px solid #ccc;
-}
-.right-panel {
-  background: #f5f5f5;
+.step.blue {
+  background-color: #007bff;
 }
 
-/* Iframe style */
-#docIframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* Comments section */
+/* Comment items & Reviewer Name box styling */
 .comment-item {
   background: #fff;
   margin-bottom: 15px;
@@ -98,7 +135,7 @@ main {
   min-height: 60px;
 }
 
-/* Button style */
+/* Buttons */
 button {
   background: #007bff;
   color: #fff;
@@ -109,23 +146,4 @@ button {
 }
 button:hover {
   opacity: 0.9;
-}
-
-/* Progress bar color states: .gray, .yellow, .blue */
-.step.gray {
-  background-color: gray;
-}
-.step.yellow {
-  background-color: gold;
-}
-.step.blue {
-  background-color: #007bff;
-}
-
-/* Footer */
-footer {
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  background: #fff;
-  text-align: right;
 }
