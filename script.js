@@ -229,7 +229,7 @@ function handleSubmitAll() {
       console.log("Submitting data to Power Automate:", payload);
 
       // POST to your Power Automate endpoint that handles updating the SharePoint list.
-      fetch("https://your-power-automate-endpoint-for-updating.com", {
+      fetch("https://prod-101.westus.logic.azure.com:443/workflows/a89622dede3e4598bf5403e30fedf87b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=kD52-8wSlzumCmCs_In5ugvt_cndHeOptsjPyQWHGd0", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
