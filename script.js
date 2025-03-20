@@ -16,11 +16,7 @@ function getDocumentIdFromUrl() {
  */
 function injectHighlightStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
-  styleEl.textContent = `
-    body {
-      margin: 0;
-      padding: 0;
-    }
+  styleEl.textContent = 
     .highlighted-text {
       background-color: yellow;
       transition: background-color 0.3s ease;
