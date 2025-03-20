@@ -3,43 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <title>Reviewer Portal</title>
-  <!-- Link your stylesheet -->
   <link rel="stylesheet" href="style.css" />
-  <!-- Load your main script (use `defer` so it executes after DOM loads) -->
   <script src="script.js" defer></script>
 </head>
 <body>
-
-  <!-- Header area: Logo + Progress Bar -->
+  <!-- Fixed Header: logo on left, progress bar centered -->
   <header>
     <div class="logo">
-      <!-- Place your logo image here -->
       <img src="https://raw.githubusercontent.com/aicounsel/reviewer/refs/heads/main/AI%20Counsel%20Client%20Assistant%20Logo.png" alt="AI Counsel Client Assistant Logo" />
     </div>
-    <div id="progressBarContainer">
-      <!-- The progress bar segments will be injected by script.js -->
-    </div>
+    <div id="progressBarContainer"></div>
   </header>
 
-  <!-- Main container: left side = document, right side = comment panel -->
+  <!-- Main content area; note the top and bottom padding to avoid overlap with fixed header/footer -->
   <main>
-    <!-- Left panel: will load the cleaned HTML doc from /agreements/<DocumentID>.html -->
+    <!-- Left panel: document iframe with reduced padding -->
     <section id="documentContainer" class="panel left-panel">
-      <!-- The script can dynamically load or inject the HTML content here, 
-           or you can embed an <iframe> with the correct src. Example: -->
       <iframe id="docIframe" src="" frameborder="0"></iframe>
     </section>
-
-    <!-- Right panel: list of comments + responses -->
+    <!-- Right panel: comments and reviewer name box -->
     <section id="commentContainer" class="panel right-panel">
-      <!-- The script will inject comment items here -->
+      <!-- Reviewer Name box will be injected here -->
     </section>
   </main>
 
-  <!-- Footer with a "Submit All" button (optional location) -->
+  <!-- Fixed Footer: submit button -->
   <footer>
     <button id="submitAllBtn">Submit All Answers</button>
   </footer>
-
 </body>
 </html>
+
