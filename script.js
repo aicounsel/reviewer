@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 2. Once the iframe finishes loading, inject CSS for .highlighted-text
   docIframe.addEventListener("load", () => {
-    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
+    const iframeDoc =
+      docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
       injectHighlightStyle(iframeDoc);
     }
@@ -33,16 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const reviewerNameDiv = document.createElement("div");
   // Use the same outer class as a comment box and add an extra class to identify it.
   reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
-  
+
   // Create an inner container for the reviewer name (like a response area)
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
-  
+
   // Create a label
   const nameLabel = document.createElement("div");
   nameLabel.textContent = "Your Name";
   nameLabel.style.fontWeight = "bold";
-  
+
   // Create an input field for the reviewer name.
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Name...";
@@ -50,14 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
   nameInput.required = true;
   nameInput.style.width = "100%";
   nameInput.style.marginBottom = "10px";
-  
+
   // Append label and input to the inner container.
   nameResponseDiv.appendChild(nameLabel);
   nameResponseDiv.appendChild(nameInput);
-  
+
   // Append the inner container to the outer container.
   reviewerNameDiv.appendChild(nameResponseDiv);
-  
+
   // Insert the reviewer name box at the top of the comment container.
   const commentContainer = document.getElementById("commentContainer");
   commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
@@ -106,20 +107,45 @@ function injectHighlightStyle(iframeDoc) {
   `;
   iframeDoc.head.appendChild(styleEl);
 }
+
 /**
  * Helper: Format date string into "M/D/YYYY h:mm AM/PM" format.
  */
 function formatDate(dateString) {
   const date = new Date(dateString);
-  // Use toLocaleString with options, then remove the comma
-  return date.toLocaleString("en-US", {
-    month: "numeric",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).replace(",", "");
+  if (isNaN(date)) {
+    console.warn("Invalid date:", dateString);
+    return "Invalid Date";
+  }
+  // Use toLocaleString with options, then remove any comma.
+  return date
+    .toLocaleString("en-US", {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .replace(",", "");
+}
+
+/**
+ * Render the progress bar in #progressBarContainer.
+ */
+function renderProgressBar(comments) {
+  const progressBarContainer = document.getElementById("progressBarContainer");
+  progressBarContainer.innerHTML = ""; // Clear existing
+  comments.forEach((comment, index) => {
+    const stepDiv = document.createElement("div");
+    stepDiv.classList.add("step", "gray"); // Default color: gray
+    const stepLabel = document.createElement("span");
+    stepLabel.textContent = index + 1;
+    stepDiv.appendChild(stepLabel);
+    progressBarContainer.appendChild(stepDiv);
+    // Store reference for later color updates.
+    comment.stepElement = stepDiv;
+  });
 }
 
 /**
@@ -208,7 +234,9 @@ function handleSubmitAll() {
   }
 
   // Validate that all comment responses are filled.
-  const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
+  const commentItems = document.querySelectorAll(
+    ".comment-item:not(.reviewer-name-item)"
+  );
   let allFilled = true;
   commentItems.forEach((item) => {
     const textarea = item.querySelector("textarea");
@@ -234,7 +262,9 @@ function handleSubmitAll() {
       );
 
       // Collect responses from the DOM.
-      const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
+      const commentItems = document.querySelectorAll(
+        ".comment-item:not(.reviewer-name-item)"
+      );
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
         const textVal = textarea.value.trim();
@@ -307,7 +337,8 @@ function handleSubmitAll() {
  */
 function highlightDocumentText(textID, highlight) {
   const docIframe = document.getElementById("docIframe");
-  const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
+  const iframeDoc =
+    docIframe.contentDocument || docIframe.contentWindow.document;
   if (!iframeDoc) return;
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
