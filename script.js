@@ -3,92 +3,7 @@
  * Reviewer Portal
  *************************************************/
 
-// Power Automate endpoint for fetching comments
-const COMMENTS_URL =
-  "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
-
-document.addEventListener("DOMContentLoaded", () => {
-  const documentId = getDocumentIdFromUrl();
-
-  // If no DocumentID is provided, alert and exit.
-  if (!documentId) {
-    alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
-    return;
-  }
-
-  // 1. Set the iframe source to the matching .html in /agreements
-  const docIframe = document.getElementById("docIframe");
-  docIframe.src = `./agreements/${documentId}.html`;
-
-  // 2. Once the iframe finishes loading, inject CSS for .highlighted-text
-  docIframe.addEventListener("load", () => {
-    const iframeDoc =
-      docIframe.contentDocument || docIframe.contentWindow.document;
-    if (iframeDoc) {
-      injectHighlightStyle(iframeDoc);
-    }
-  });
-
-  // 3. Insert Reviewer Name interaction box above the first comment box.
-  // It will look like a comment interaction box (same container style) but without metadata or the "mark as complete" button.
-  const reviewerNameDiv = document.createElement("div");
-  // Use the same outer class as a comment box and add an extra class to identify it.
-  reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
-
-  // Create an inner container for the reviewer name (like a response area)
-  const nameResponseDiv = document.createElement("div");
-  nameResponseDiv.classList.add("response-area");
-
-  // Create a label
-  const nameLabel = document.createElement("div");
-  nameLabel.textContent = "Your Name";
-  nameLabel.style.fontWeight = "bold";
-
-  // Create an input field for the reviewer name.
-  const nameInput = document.createElement("input");
-  nameInput.placeholder = "Enter Your Name...";
-  nameInput.id = "reviewerNameInput";
-  nameInput.required = true;
-  nameInput.style.width = "100%";
-  nameInput.style.marginBottom = "10px";
-
-  // Append label and input to the inner container.
-  nameResponseDiv.appendChild(nameLabel);
-  nameResponseDiv.appendChild(nameInput);
-
-  // Append the inner container to the outer container.
-  reviewerNameDiv.appendChild(nameResponseDiv);
-
-  // Insert the reviewer name box at the top of the comment container.
-  const commentContainer = document.getElementById("commentContainer");
-  commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
-
-  // 4. Fetch comments from Power Automate
-  fetch(COMMENTS_URL, {
-    method: "POST", // since your flow uses an HTTP POST trigger
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ DocumentID: documentId })
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      // data now contains { DocumentID, Comments }
-      const commentsForDoc = data.Comments || [];
-      renderProgressBar(commentsForDoc);
-      renderComments(commentsForDoc);
-    })
-    .catch((err) => {
-      console.error("Error fetching comments:", err);
-    });
-
-  // 5. Set up "Submit All" button with required-field validation.
-  document
-    .getElementById("submitAllBtn")
-    .addEventListener("click", handleSubmitAll);
-});
-
-/**
- * Helper: Extract DocumentID from the query string (?documentId=XYZ)
- */
+// Helper: Extract DocumentID from the query string (?documentId=XYZ)
 function getDocumentIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("documentId");
@@ -117,7 +32,6 @@ function formatDate(dateString) {
     console.warn("Invalid date:", dateString);
     return "Invalid Date";
   }
-  // Use toLocaleString with options, then remove any comma.
   return date
     .toLocaleString("en-US", {
       month: "numeric",
@@ -154,6 +68,9 @@ function renderProgressBar(comments) {
 function renderComments(comments) {
   // Reviewer Name box is already inserted at the top.
   const commentContainer = document.getElementById("commentContainer");
+
+  // Log the comments array to help debug.
+  console.log("Rendering comments:", comments);
 
   // Loop over each comment.
   comments.forEach((comment) => {
@@ -217,6 +134,24 @@ function renderComments(comments) {
     commentItem.appendChild(responseDiv);
     commentContainer.appendChild(commentItem);
   });
+}
+
+/**
+ * Highlights or un-highlights text in the loaded iframe.
+ */
+function highlightDocumentText(textID, highlight) {
+  const docIframe = document.getElementById("docIframe");
+  const iframeDoc =
+    docIframe.contentDocument || docIframe.contentWindow.document;
+  if (!iframeDoc) return;
+  const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
+  if (!anchor) return;
+  if (highlight) {
+    anchor.classList.add("highlighted-text");
+    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    anchor.classList.remove("highlighted-text");
+  }
 }
 
 /**
@@ -332,20 +267,68 @@ function handleSubmitAll() {
     });
 }
 
-/**
- * Highlights or un-highlights text in the loaded iframe.
- */
-function highlightDocumentText(textID, highlight) {
-  const docIframe = document.getElementById("docIframe");
-  const iframeDoc =
-    docIframe.contentDocument || docIframe.contentWindow.document;
-  if (!iframeDoc) return;
-  const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
-  if (!anchor) return;
-  if (highlight) {
-    anchor.classList.add("highlighted-text");
-    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
-  } else {
-    anchor.classList.remove("highlighted-text");
+// Main code: run after DOM loads.
+document.addEventListener("DOMContentLoaded", () => {
+  const documentId = getDocumentIdFromUrl();
+
+  // If no DocumentID is provided, alert and exit.
+  if (!documentId) {
+    alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
+    return;
   }
-}
+
+  // 1. Set the iframe source to the matching .html in /agreements
+  const docIframe = document.getElementById("docIframe");
+  docIframe.src = `./agreements/${documentId}.html`;
+
+  // 2. Once the iframe finishes loading, inject CSS for .highlighted-text
+  docIframe.addEventListener("load", () => {
+    const iframeDoc =
+      docIframe.contentDocument || docIframe.contentWindow.document;
+    if (iframeDoc) {
+      injectHighlightStyle(iframeDoc);
+    }
+  });
+
+  // 3. Insert Reviewer Name interaction box above the first comment box.
+  const reviewerNameDiv = document.createElement("div");
+  reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
+  const nameResponseDiv = document.createElement("div");
+  nameResponseDiv.classList.add("response-area");
+  const nameLabel = document.createElement("div");
+  nameLabel.textContent = "Your Name";
+  nameLabel.style.fontWeight = "bold";
+  const nameInput = document.createElement("input");
+  nameInput.placeholder = "Enter Your Name...";
+  nameInput.id = "reviewerNameInput";
+  nameInput.required = true;
+  nameInput.style.width = "100%";
+  nameInput.style.marginBottom = "10px";
+  nameResponseDiv.appendChild(nameLabel);
+  nameResponseDiv.appendChild(nameInput);
+  reviewerNameDiv.appendChild(nameResponseDiv);
+  const commentContainer = document.getElementById("commentContainer");
+  commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
+
+  // 4. Fetch comments from Power Automate.
+  fetch(COMMENTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ DocumentID: documentId })
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Fetched data:", data);
+      const commentsForDoc = data.Comments || [];
+      renderProgressBar(commentsForDoc);
+      renderComments(commentsForDoc);
+    })
+    .catch((err) => {
+      console.error("Error fetching comments:", err);
+    });
+
+  // 5. Set up "Submit All" button with required-field validation.
+  document
+    .getElementById("submitAllBtn")
+    .addEventListener("click", handleSubmitAll);
+});
