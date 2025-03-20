@@ -19,24 +19,6 @@ header {
   padding: 10px;
 }
 
-main {
-  margin-top: 80px; /* Adjust based on header height */
-  margin-bottom: 60px; /* Adjust based on footer height */
-}
-
-/* Footer: Fixed at the bottom */
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #fff; /* White background */
-  z-index: 1000;
-  border-top: 1px solid #ccc;
-  padding: 10px;
-  text-align: right;
-}
-
 .logo img {
   height: 40px;
 }
@@ -142,4 +124,22 @@ button:hover {
 }
 .step.blue {
   background-color: #007bff;
+}
+
+main {
+  margin-top: 80px; /* Adjust based on header height */
+  margin-bottom: 60px; /* Adjust based on footer height */
+}
+
+/* Footer: Fixed at the bottom */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff; /* White background */
+  z-index: 1000;
+  border-top: 1px solid #ccc;
+  padding: 10px;
+  text-align: right;
 }
