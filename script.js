@@ -15,34 +15,38 @@ const COMMENTS_URL =
  */
 document.addEventListener("DOMContentLoaded", () => {
   const documentId = getDocumentIdFromUrl();
+
   if (!documentId) {
     alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
     return;
   }
 
-  // Create a container for reviewer info if it doesn't exist.
-  let reviewerInfoDiv = document.getElementById("reviewerInfo");
-  if (!reviewerInfoDiv) {
-    reviewerInfoDiv = document.createElement("div");
-    reviewerInfoDiv.id = "reviewerInfo";
-    // Insert at the top of the body or before the comment container.
-    document.body.insertBefore(reviewerInfoDiv, document.body.firstChild);
-  }
+  // Create the reviewer bubble
+  const reviewerBubble = document.createElement("div");
+  reviewerBubble.id = "reviewerBubble";
+  // Inline CSS for the bubble (customize as needed)
+  reviewerBubble.style.cssText = "border: 1px solid #ccc; padding: 10px; background: #f7f7f7; margin: 10px; width: 250px; float: right;";
   
-  // Create label for the input field.
   const nameLabel = document.createElement("label");
   nameLabel.textContent = "Your Name: ";
   nameLabel.setAttribute("for", "reviewerName");
-
-  // Create the input field.
+  
   const reviewerNameInput = document.createElement("input");
   reviewerNameInput.id = "reviewerName";
   reviewerNameInput.type = "text";
   reviewerNameInput.placeholder = "Enter your name";
 
-  // Append the label and input to the reviewerInfo div.
-  reviewerInfoDiv.appendChild(nameLabel);
-  reviewerInfoDiv.appendChild(reviewerNameInput);
+  reviewerBubble.appendChild(nameLabel);
+  reviewerBubble.appendChild(reviewerNameInput);
+
+  // Insert the bubble just below the header (if a header exists), or before the comments.
+  const header = document.getElementById("header");
+  if (header) {
+    header.insertAdjacentElement("afterend", reviewerBubble);
+  } else {
+    // Alternatively, insert above the comment container.
+    document.getElementById("commentContainer").insertAdjacentElement("beforebegin", reviewerBubble);
+  }
 
   // 1. Set the iframe source to the matching .html in /agreements
   const docIframe = document.getElementById("docIframe");
@@ -78,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("submitAllBtn")
     .addEventListener("click", handleSubmitAll);
 });
+
 
 /**
  * Helper: Extract DocumentID from the query string (?documentId=XYZ)
