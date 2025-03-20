@@ -28,26 +28,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 3. Insert Reviewer Name box (styled like a comment box but without metadata or button)
-  const reviewerBox = document.createElement("div");
-  reviewerBox.classList.add("comment-item");  // mimic comment-item styling
+  // 3. Insert Reviewer Name interaction box above the first comment/response box.
+  // Create a container for the reviewer name input.
+  const reviewerNameDiv = document.createElement("div");
+  reviewerNameDiv.classList.add("interaction-box");
   // Create a label.
-  const reviewerLabel = document.createElement("div");
-  reviewerLabel.textContent = "Your Name";
-  reviewerLabel.style.fontWeight = "bold";
+  const nameLabel = document.createElement("div");
+  nameLabel.textContent = "Your Name";
+  nameLabel.style.fontWeight = "bold";
   // Create an input field.
-  const reviewerInput = document.createElement("input");
-  reviewerInput.placeholder = "Enter Your Name...";
-  reviewerInput.id = "reviewerNameInput";
-  reviewerInput.style.width = "100%";
-  reviewerInput.style.marginBottom = "10px";
-  reviewerInput.required = true; // Field is required.
-  // Append label and input to the reviewer box.
-  reviewerBox.appendChild(reviewerLabel);
-  reviewerBox.appendChild(reviewerInput);
+  const nameInput = document.createElement("input");
+  nameInput.placeholder = "Enter Your Name...";
+  nameInput.id = "reviewerNameInput";
+  nameInput.style.width = "100%";
+  nameInput.style.marginBottom = "10px";
+  // Append label and input to the container.
+  reviewerNameDiv.appendChild(nameLabel);
+  reviewerNameDiv.appendChild(nameInput);
   // Insert this box at the top of the comment container.
   const commentContainer = document.getElementById("commentContainer");
-  commentContainer.insertAdjacentElement("afterbegin", reviewerBox);
+  commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
 
   // 4. Fetch comments from Power Automate
   fetch(COMMENTS_URL, {
@@ -118,14 +118,16 @@ function renderProgressBar(comments) {
 function renderComments(comments) {
   const commentContainer = document.getElementById("commentContainer");
   // (Reviewer Name box is already inserted at the top)
+  commentContainer.innerHTML += ""; // Ensuring container is ready.
+
   comments.forEach((comment) => {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Comment metadata: Show Author and formatted Date (ID removed)
+    // Comment metadata.
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
-    metadataDiv.textContent = `Author: ${comment.CommentAuthor} | Date: ${formatDate(comment.CommentDateTime)}`;
+    metadataDiv.textContent = `ID: ${comment.CommentID} | Author: ${comment.CommentAuthor} | Date: ${comment.CommentDateTime}`;
     commentItem.appendChild(metadataDiv);
 
     // Comment text.
@@ -141,7 +143,6 @@ function renderComments(comments) {
     // Create a textarea for entering the response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
-    textarea.required = true;  // Field is required.
     responseDiv.appendChild(textarea);
 
     // Create a "Mark as Complete" button.
@@ -180,28 +181,13 @@ function renderComments(comments) {
 }
 
 /**
- * Format a date string into "M/D/YYYY H:MM AM/PM".
- */
-function formatDate(dateString) {
-  const d = new Date(dateString);
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
-  const year = d.getFullYear();
-  let hours = d.getHours();
-  const minutes = d.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  if (hours === 0) hours = 12;
-  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-  return `${month}/${day}/${year} ${hours}:${minutesStr} ${ampm}`;
-}
-
-/**
- * Called when user clicks "Submit All Answers".
+ * Called when user clicks "Submit All Answers"
  * Gathers up responses and sends them to the Power Automate flow.
  */
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
+
+  // Get the reviewer's name from the input box.
   const reviewerName = document.getElementById("reviewerNameInput").value.trim() || "Reviewer Name";
 
   fetch(COMMENTS_URL, {
@@ -218,16 +204,16 @@ function handleSubmitAll() {
       // Collect responses from the DOM.
       const commentItems = document.querySelectorAll(".comment-item");
       commentItems.forEach((item, idx) => {
-        // Skip the first item (Reviewer Name box)
-        if (idx === 0) return;
         const textarea = item.querySelector("textarea");
         const textVal = textarea.value.trim();
-        commentsForDoc[idx - 1].response = textVal;
+        commentsForDoc[idx].response = textVal;
       });
 
-      // Build payload including additional response details.
+      // Compute total number of comments.
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
+
+      // Build payload including computed ResponseID and other details.
       const payloadComments = commentsForDoc.map((c) => {
         if (c.response && c.response !== "") {
           responseIndex++;
@@ -262,6 +248,7 @@ function handleSubmitAll() {
 
       console.log("Submitting data to Power Automate:", payload);
 
+      // POST the payload to the update flow.
       fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
