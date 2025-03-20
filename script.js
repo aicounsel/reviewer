@@ -1,6 +1,6 @@
 /*************************************************
  * script.js 
- * Skeleton for the reviewer portal logic
+ * Reviewer Portal
  *************************************************/
 
 // Power Automate endpoint for fetching comments
