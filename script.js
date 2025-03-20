@@ -192,12 +192,15 @@ function renderComments(comments) {
  */
 console.log("Submit All Answers clicked.");
 function handleSubmitAll() {
-  // We'll assume we've already fetched comments. If we store them globally or re-fetch them:
-  fetch(COMMENTS_URL)
+  const documentId = getDocumentIdFromUrl();
+  fetch(COMMENTS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ DocumentID: documentId })
+  })
     .then((res) => res.json())
     .then((allData) => {
       // allData is { DocumentID, Comments }
-      const documentId = getDocumentIdFromUrl();
       // Filter comments for this DocumentID
       const commentsForDoc = allData.Comments.filter(
         (c) => c.DocumentID === documentId
