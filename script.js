@@ -28,24 +28,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 3. Insert Reviewer Name interaction box above the first comment/response box.
-  // Create a container for the reviewer name input.
+  // 3. Insert Reviewer Name interaction box above the first comment box.
+  // It will look like a comment interaction box (same container style) but without metadata or the "mark as complete" button.
   const reviewerNameDiv = document.createElement("div");
-  reviewerNameDiv.classList.add("interaction-box");
-  // Create a label.
+  // Use the same outer class as a comment box and add an extra class to identify it.
+  reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
+  
+  // Create an inner container for the reviewer name (like a response area)
+  const nameResponseDiv = document.createElement("div");
+  nameResponseDiv.classList.add("response-area");
+  
+  // Create a label
   const nameLabel = document.createElement("div");
   nameLabel.textContent = "Your Name";
   nameLabel.style.fontWeight = "bold";
-  // Create an input field.
+  
+  // Create an input field for the reviewer name.
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Name...";
   nameInput.id = "reviewerNameInput";
+  nameInput.required = true;
   nameInput.style.width = "100%";
   nameInput.style.marginBottom = "10px";
-  // Append label and input to the container.
-  reviewerNameDiv.appendChild(nameLabel);
-  reviewerNameDiv.appendChild(nameInput);
-  // Insert this box at the top of the comment container.
+  
+  // Append label and input to the inner container.
+  nameResponseDiv.appendChild(nameLabel);
+  nameResponseDiv.appendChild(nameInput);
+  
+  // Append the inner container to the outer container.
+  reviewerNameDiv.appendChild(nameResponseDiv);
+  
+  // Insert the reviewer name box at the top of the comment container.
   const commentContainer = document.getElementById("commentContainer");
   commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
 
@@ -66,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching comments:", err);
     });
 
-  // 5. Set up "Submit All" button
+  // 5. Set up "Submit All" button with required-field validation.
   document
     .getElementById("submitAllBtn")
     .addEventListener("click", handleSubmitAll);
@@ -116,10 +129,10 @@ function renderProgressBar(comments) {
  * Render comments and their interaction boxes in #commentContainer.
  */
 function renderComments(comments) {
+  // Reviewer Name box is already inserted at the top.
   const commentContainer = document.getElementById("commentContainer");
-  // (Reviewer Name box is already inserted at the top)
-  commentContainer.innerHTML += ""; // Ensuring container is ready.
 
+  // Loop over each comment.
   comments.forEach((comment) => {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
@@ -143,11 +156,13 @@ function renderComments(comments) {
     // Create a textarea for entering the response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
+    textarea.required = true;
     responseDiv.appendChild(textarea);
 
     // Create a "Mark as Complete" button.
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
+
     // Event listeners for focus, blur, and button click.
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
@@ -181,15 +196,34 @@ function renderComments(comments) {
 }
 
 /**
- * Called when user clicks "Submit All Answers"
- * Gathers up responses and sends them to the Power Automate flow.
+ * Called when user clicks "Submit All Answers".
+ * Validates that all fields are filled in, then gathers responses and sends them to the Power Automate flow.
  */
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
 
-  // Get the reviewer's name from the input box.
-  const reviewerName = document.getElementById("reviewerNameInput").value.trim() || "Reviewer Name";
+  // Validate reviewer name is provided.
+  const reviewerNameInput = document.getElementById("reviewerNameInput");
+  if (!reviewerNameInput.value.trim()) {
+    alert("Please enter your name.");
+    return;
+  }
 
+  // Validate that all comment responses are filled.
+  const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
+  let allFilled = true;
+  commentItems.forEach((item) => {
+    const textarea = item.querySelector("textarea");
+    if (textarea && !textarea.value.trim()) {
+      allFilled = false;
+    }
+  });
+  if (!allFilled) {
+    alert("Please fill out all comment responses.");
+    return;
+  }
+
+  // Re-fetch the comments to build the submission payload.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -202,7 +236,7 @@ function handleSubmitAll() {
       );
 
       // Collect responses from the DOM.
-      const commentItems = document.querySelectorAll(".comment-item");
+      const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
         const textVal = textarea.value.trim();
@@ -213,7 +247,7 @@ function handleSubmitAll() {
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
 
-      // Build payload including computed ResponseID and other details.
+      // Build payload including computed response details.
       const payloadComments = commentsForDoc.map((c) => {
         if (c.response && c.response !== "") {
           responseIndex++;
@@ -221,7 +255,7 @@ function handleSubmitAll() {
             CommentID: c.CommentID,
             ResponseID: `_cmnt${totalComments + responseIndex}`,
             ResponseText: c.response,
-            ResponseAuthor: reviewerName,
+            ResponseAuthor: reviewerNameInput.value.trim(),
             ResponseDateTime: new Date().toISOString(),
             ResponseTextID: `_cmntref${totalComments + responseIndex}`,
             ResponseTextHighlight: c.TextHighlight,
@@ -249,11 +283,14 @@ function handleSubmitAll() {
       console.log("Submitting data to Power Automate:", payload);
 
       // POST the payload to the update flow.
-      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+      fetch(
+        "https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      )
         .then(() => {
           alert("Responses submitted successfully!");
         })
