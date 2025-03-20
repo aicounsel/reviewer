@@ -106,23 +106,20 @@ function injectHighlightStyle(iframeDoc) {
   `;
   iframeDoc.head.appendChild(styleEl);
 }
-
 /**
- * Render the progress bar in #progressBarContainer.
+ * Helper: Format date string into "M/D/YYYY h:mm AM/PM" format.
  */
-function renderProgressBar(comments) {
-  const progressBarContainer = document.getElementById("progressBarContainer");
-  progressBarContainer.innerHTML = ""; // Clear existing
-  comments.forEach((comment, index) => {
-    const stepDiv = document.createElement("div");
-    stepDiv.classList.add("step", "gray"); // Default color: gray
-    const stepLabel = document.createElement("span");
-    stepLabel.textContent = index + 1;
-    stepDiv.appendChild(stepLabel);
-    progressBarContainer.appendChild(stepDiv);
-    // Store reference for later color updates.
-    comment.stepElement = stepDiv;
-  });
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  // Use toLocaleString with options, then remove the comma
+  return date.toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).replace(",", "");
 }
 
 /**
@@ -137,10 +134,11 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Comment metadata.
+    // Comment metadata (without the ID and with formatted date).
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
-    metadataDiv.textContent = `ID: ${comment.CommentID} | Author: ${comment.CommentAuthor} | Date: ${comment.CommentDateTime}`;
+    const formattedDate = formatDate(comment.CommentDateTime);
+    metadataDiv.textContent = `Author: ${comment.CommentAuthor} | Date: ${formattedDate}`;
     commentItem.appendChild(metadataDiv);
 
     // Comment text.
