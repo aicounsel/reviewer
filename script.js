@@ -135,21 +135,25 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
+    // In your renderComments function, wrap the number and metadata in a container.
+const headerDiv = document.createElement("div");
+headerDiv.classList.add("comment-header");
+    
     // Create a span for the fancy number.
-    const numberSpan = document.createElement("span");
-    numberSpan.classList.add("comment-number");
-    // Unicode for ➊ is 0x278A. This computes the correct number.
-    numberSpan.textContent = String.fromCodePoint(0x278A + index);
-    // Append the numberSpan as the first element of commentItem.
-    commentItem.appendChild(numberSpan);
+const numberSpan = document.createElement("span");
+numberSpan.classList.add("comment-number");
+numberSpan.textContent = String.fromCodePoint(0x278A + index);
+headerDiv.appendChild(numberSpan);
 
-    // Create metadata element (displaying Author and formatted Date).
-    const metadataDiv = document.createElement("div");
-    metadataDiv.classList.add("comment-metadata");
-    const formattedDate = formatDate(comment.CommentDateTime);
-    const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
-    metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
-    commentItem.appendChild(metadataDiv);
+// Create the metadata element.
+const metadataDiv = document.createElement("div");
+metadataDiv.classList.add("comment-metadata");
+const formattedDate = formatDate(comment.CommentDateTime);
+const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
+metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
+headerDiv.appendChild(metadataDiv);
+    // Append the headerDiv to your commentItem.
+commentItem.appendChild(headerDiv);
 
     // Create comment text element.
     const textDiv = document.createElement("div");
