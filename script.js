@@ -119,7 +119,9 @@ function renderProgressBar(comments) {
       stepEl.appendChild(lineEl);
     }
 
+    // Attach the step element to the container.
     progressBarContainer.appendChild(stepEl);
+
     // Save a reference for later updates.
     comment.stepElement = stepEl;
   });
@@ -130,52 +132,54 @@ function renderComments(comments) {
   const commentContainer = document.getElementById("commentContainer");
   console.log("Rendering comments:", comments);
 
-  // Loop over each comment with its index.
   comments.forEach((comment, index) => {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // In your renderComments function, wrap the number and metadata in a container.
-const headerDiv = document.createElement("div");
-headerDiv.classList.add("comment-header");
-    
-    // Create a span for the fancy number.
-const numberSpan = document.createElement("span");
-numberSpan.classList.add("comment-number");
-numberSpan.textContent = String.fromCodePoint(0x278A + index);
-headerDiv.appendChild(numberSpan);
+    // Header container for the fancy number + metadata.
+    const headerDiv = document.createElement("div");
+    headerDiv.classList.add("comment-header");
 
-// Create the metadata element.
-const metadataDiv = document.createElement("div");
-metadataDiv.classList.add("comment-metadata");
-const formattedDate = formatDate(comment.CommentDateTime);
-const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
-metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
-headerDiv.appendChild(metadataDiv);
+    // Fancy number: ➊, ➋, etc.
+    const numberSpan = document.createElement("span");
+    numberSpan.classList.add("comment-number");
+    // For ➊ start: 0x278A + index => ➊, ➋, etc.
+    numberSpan.textContent = String.fromCodePoint(0x278A + index);
+    headerDiv.appendChild(numberSpan);
+
+    // Metadata (Author + Date).
+    const metadataDiv = document.createElement("div");
+    metadataDiv.classList.add("comment-metadata");
+    const formattedDate = formatDate(comment.CommentDateTime);
+    // Remove any bracketed numbers from author.
+    const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
+    metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
+    headerDiv.appendChild(metadataDiv);
+
     // Append the headerDiv to your commentItem.
-commentItem.appendChild(headerDiv);
+    commentItem.appendChild(headerDiv);
 
-    // Create comment text element.
+    // Comment text element.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Create interaction area for responses.
+    // Interaction area for the response.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
-    // Create a textarea for entering the response.
+    // Textarea for user response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
-    // Create a "Mark as Complete" button.
+    // "Mark as Complete" button.
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // Event listeners for focus, blur, and button click.
+    // Event listeners for focus, blur, and "Mark as Complete".
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
@@ -183,6 +187,7 @@ commentItem.appendChild(headerDiv);
       }
       highlightDocumentText(comment.TextID, true);
     });
+
     textarea.addEventListener("blur", () => {
       if (!textarea.value.trim()) {
         if (comment.stepElement && !comment.isComplete) {
@@ -192,6 +197,7 @@ commentItem.appendChild(headerDiv);
       }
       highlightDocumentText(comment.TextID, false);
     });
+
     completeBtn.addEventListener("click", () => {
       comment.response = textarea.value.trim();
       comment.isComplete = true;
@@ -200,8 +206,8 @@ commentItem.appendChild(headerDiv);
         comment.stepElement.classList.add("complete");
       }
     });
-    responseDiv.appendChild(completeBtn);
 
+    responseDiv.appendChild(completeBtn);
     commentItem.appendChild(responseDiv);
     commentContainer.appendChild(commentItem);
   });
@@ -214,8 +220,10 @@ function highlightDocumentText(textID, highlight) {
   const docIframe = document.getElementById("docIframe");
   const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
   if (!iframeDoc) return;
+
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
+
   if (highlight) {
     anchor.classList.add("highlighted-text");
     anchor.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -227,13 +235,14 @@ function highlightDocumentText(textID, highlight) {
 // Handle "Submit All" button click.
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
+  // Make sure the "Your Name" bubble is in the DOM and has an ID of reviewerNameInput.
   const reviewerNameInput = document.getElementById("reviewerNameInput");
-  if (!reviewerNameInput.value.trim()) {
+  if (!reviewerNameInput || !reviewerNameInput.value.trim()) {
     alert("Please enter your name.");
     return;
   }
 
-  // Validate that all comment responses (excluding the intro bubble) are filled.
+  // Validate that all comment responses (excluding the intro bubble / name bubble) are filled.
   const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
   let allFilled = true;
   commentItems.forEach((item) => {
@@ -251,11 +260,13 @@ function handleSubmitAll() {
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ DocumentID: documentId })
+    body: JSON.stringify({ DocumentID: documentId }),
   })
     .then((res) => res.json())
     .then((allData) => {
-      const commentsForDoc = allData.Comments.filter(c => c.DocumentID === documentId);
+      const commentsForDoc = allData.Comments.filter(
+        (c) => c.DocumentID === documentId
+      );
 
       // Collect responses from DOM.
       const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
@@ -267,7 +278,7 @@ function handleSubmitAll() {
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
 
-      const payloadComments = commentsForDoc.map(c => {
+      const payloadComments = commentsForDoc.map((c) => {
         if (c.response && c.response !== "") {
           responseIndex++;
           return {
@@ -278,7 +289,7 @@ function handleSubmitAll() {
             ResponseDateTime: new Date().toISOString(),
             ResponseTextID: `_cmntref${totalComments + responseIndex}`,
             ResponseTextHighlight: c.TextHighlight,
-            ResponseFullText: c.FullText
+            ResponseFullText: c.FullText,
           };
         } else {
           return {
@@ -289,23 +300,26 @@ function handleSubmitAll() {
             ResponseDateTime: "",
             ResponseTextID: "",
             ResponseTextHighlight: "",
-            ResponseFullText: ""
+            ResponseFullText: "",
           };
         }
       });
 
       const payload = {
         DocumentID: documentId,
-        Comments: payloadComments
+        Comments: payloadComments,
       };
 
       console.log("Submitting data to Power Automate:", payload);
 
-      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+      fetch(
+        "https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      )
         .then(() => {
           alert("Responses submitted successfully!");
         })
@@ -330,9 +344,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. Set the iframe source to the matching HTML in /agreements.
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
+
   docIframe.addEventListener("load", () => {
-    const iframeDoc =
-      docIframe.contentDocument || docIframe.contentWindow.document;
+    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
       // Inject the document font override.
       injectDocumentStyle(iframeDoc);
@@ -366,20 +380,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. Insert the "Your Name" bubble immediately below the intro bubble.
   const reviewerNameDiv = document.createElement("div");
   reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
+  
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
+
   const nameLabel = document.createElement("div");
   nameLabel.textContent = "Let's start with your name:";
+  
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
   nameInput.required = true;
   nameInput.style.width = "100%";
   nameInput.style.marginBottom = "10px";
+
+  // Append label and input to the name bubble.
   nameResponseDiv.appendChild(nameLabel);
   nameResponseDiv.appendChild(nameInput);
   reviewerNameDiv.appendChild(nameResponseDiv);
-  // Insert the reviewer name bubble right after the intro bubble.
+
+  // Insert the "Your Name" bubble right after the intro bubble.
   introDiv.insertAdjacentElement("afterend", reviewerNameDiv);
 
   // 4. Fetch comments from Power Automate.
@@ -407,5 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // 5. Set up the "Submit All" button.
-  document.getElementById("submitAllBtn").addEventListener("click", handleSubmitAll);
+  document
+    .getElementById("submitAllBtn")
+    .addEventListener("click", handleSubmitAll);
 });
