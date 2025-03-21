@@ -364,10 +364,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
   const nameLabel = document.createElement("div");
-  nameLabel.textContent = "Your Name";
-  nameLabel.style.fontWeight = "bold";  // or adjust as needed
+  nameLabel.textContent = "Let's start with your name:";
   const nameInput = document.createElement("input");
-  nameInput.placeholder = "Enter Your Name...";
+  nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
   nameInput.required = true;
   nameInput.style.width = "100%";
