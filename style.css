@@ -5,6 +5,7 @@
   box-sizing: border-box;
 }
 body {
+  overflow: hidden; /* Prevents scrolling on the main window */
   margin: 0;
   font-family: 'Roboto', sans-serif;
   background: #E5E8F0; /* not working */
@@ -89,13 +90,14 @@ footer {
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
-  
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  margin-left: 40px;
+  margin-top: 40px;
+  border-radius: 10px;
 }
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
-
-
 
 /* Iframe style */
 #docIframe {
