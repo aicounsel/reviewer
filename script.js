@@ -45,7 +45,7 @@ function injectHighlightStyle(iframeDoc) {
       font-family: 'Roboto', sans-serif !important;
     }
     .highlighted-text {
-      background-color: yellow;
+      background-color: #e8eb6d;
       transition: background-color 0.3s ease;
     }
         /* Add margins to the document body */
