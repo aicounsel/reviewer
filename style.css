@@ -1,55 +1,60 @@
-
-
-
-/* Resets and basic styling */
+//** CSS STYLES ***//
 * {
   box-sizing: border-box;
 }
+
+//** BODY ***//
+
 body {
-  overflow: hidden; /* Prevents scrolling on the main window */
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background: #E5E8F0; /* not working */
+  background: #E5E8F0;
   color: #333;
+  height: 100vh; /*claude*/
+  overflow: hidden; /*removes browser scroll bar*/
 }
+
+
+//** HEADER - FIXED AT TOP ***//
 
 header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-   height: 100px; 
+  height: 100px; 
   background-color: #fff;
   z-index: 1000;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 2px solid #ccc;
   padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center; /* center all items */
 }
 
+
+//** LOGO ***//
+
 .logo img {
   position: absolute;
   left: 20px; /* adjust as needed */
   top: 50%;
   transform: translateY(-50%);
-}
-
-.logo img {
-  max-height: 70%; /* or set a specific value like 60px */
+  max-height: 70%;
   object-fit: contain;
 }
 
-/* Panel layout (split screen) */
+//** PANEL LAYOUT - SPLIT ***//
+
 main {
-  display: flex;
-}
-main {
+  display: flex; /*2 panels*/
   margin-top: 80px; /* Adjust based on header height */
-  margin-bottom: 60px; /* Adjust based on footer height */
+  margin-bottom: 80px; /* Adjust based on footer height */
 }
 
-/* Footer: Fixed at the bottom */
+
+//** FOOTER - FIXED AT BOTTOM ***//
+
 footer {
   position: fixed;
   bottom: 0;
@@ -57,12 +62,14 @@ footer {
   right: 0;
   background-color: #fff; /* White background */
   z-index: 1000;
-  border-top: 1px solid #ccc;
+  border-top: 2px solid #ccc;
   padding: 10px;
   text-align: right;
+  height: 80px;
 }
 
-/* Container that holds all steps */
+//** PROGRESS BAR ***//
+
 #progressBarContainer {
   display: flex;
   align-items: center;
@@ -82,33 +89,49 @@ footer {
   font-size: 18px;
 }
 
+//** PANEL - LEFT AND RIGHT ***//
+
 .panel {
   flex: 1;
-  padding: 20px;
+  padding: 40px;
+  overflow-y: auto; /* If content is tall, it can scroll */
   height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
+
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
   margin-left: 40px;
   margin-top: 40px;
-  border-radius: 10px;
-  overflow-y: auto; /* If content is tall, it can scroll */
-}
-.right-panel {
-  background: #E5E8F0; /*same as chatbot*/
-  overflow-y: auto; /* If content is tall, it can scroll */
 }
 
-/* Iframe style */
+.right-panel {
+  background: #E5E8F0; /*same as chatbot*/
+}
+
+//** iFRAME ***//
+
+#docContent {
+ width: 100%;
+ height: 100%;
+ border: none;
+ padding: 20px;
+ line-height: 1.6;
+ overflow-y: right; /*not sure about this trying to get the scroll bar to the right*/
+  
+}
 #docIframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* Comments section */
+//** COMMENTS SECTION ***//
+
+
+
 .comment-item {
   background: #fff;
   margin-top: 40px;
@@ -130,6 +153,8 @@ footer {
   font-size: 1em;
 }
 
+//** WITHIN COMMENTS, RESPONSE AREA ***//
+
 .response-area {
   margin-top: 20px;
   margin-bottom: 0px;
@@ -145,7 +170,7 @@ footer {
   font-size: 1em;
 }
 
-/***Hover States***/
+//** HOVER STATES ***//
 
 .comment-item:hover,
 .comment-item:hover .response-area,
@@ -153,7 +178,7 @@ footer {
   background-color: #F2F2F2;
 }
 
-/***NAME BUBBLE***/
+//** NAME BUBBLE ***//
 
 /* Enter Your Name... */
 .reviewer-name-item input {
@@ -176,7 +201,8 @@ footer {
   font-size: 1em;
 }
 
-/*** Button style ***/
+//** BUTTON STYLE ***//
+
 button {
   background: #706DEB; /*same as chatbot*/
   color: #fff;
@@ -186,12 +212,13 @@ button {
   border-radius: 30px;
   cursor: pointer;
 }
+
 button:hover {
   opacity: 0.9;
 }
 
+//** STATES AKA DIAMONDS ***//
 
-/* --- STATES (use these classes in your JS) --- */
 /* The diamond shape: a rotated square */
 .diamond {
   position: relative;
@@ -207,6 +234,7 @@ button:hover {
   border-radius: 4px;
   box-shadow: 0 0 0 2px #fff;
 }
+
 /* Gives a white inner radius */
 .diamond::after {
   content: "";
@@ -233,35 +261,35 @@ button:hover {
 .line {
   width: 60px;  /* length of line segment */
   height: 8px;  /* thickness of line */
-  background: gray; /* default for "untouched" */
+  background: #B7B9C0; /* default for "untouched" */
 }
 
 
-/* UNTOUCHED (gray) */
+//** UNTOUCHED - GREY ***//
 .step.untouched .diamond {
-  border-color: gray;
+  border-color: #B7B9C0;
 }
 .step.untouched .diamond span {
   color: gray;
 }
 .step.untouched .line {
-  background: gray;
+  background: #B7B9C0;
 }
 
-/* IN-PROGRESS (yellow) */
+//** IN-PROGRESS - YELLOW ***//
 .step.in-progress .diamond {
-  border-color: gold;
+  border-color: #e8eb6d;
 }
 .step.in-progress .diamond span {
-  color: gold;
+  color: gray;
 }
 .step.in-progress .line {
-  background: gold;
+  background: #e8eb6d;
 }
 
-/* COMPLETE (blue) */
+//** COMPLETE - BLUE ***//
 .step.complete .diamond {
-  border-color: #706DEB; /* your "blue" from the chatbot */
+  border-color: #706DEB;
 }
 .step.complete .diamond span {
   color: #706DEB;
@@ -270,8 +298,8 @@ button:hover {
   background: #706DEB;
 }
 
+//** MISC ***//
 
-/*MISC*/
 textarea {
   resize: vertical;
 }
