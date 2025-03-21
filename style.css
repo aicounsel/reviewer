@@ -1,69 +1,66 @@
-//** CSS STYLES ***//
+
+
+/* Resets and basic styling */
 * {
   box-sizing: border-box;
 }
-
-//** BODY ***//
-
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background: #E5E8F0;
+  background: #E5E8F0; /* not working */
   color: #333;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
-
-//** HEADER - FIXED AT TOP ***//
-
 header {
-  height: 100px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+   height: 100px; 
   background-color: #fff;
-  border-bottom: 2px solid #ccc;
+  z-index: 1000;
+  border-bottom: 1px solid #ccc;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0; /* Prevent header from shrinking */
+  justify-content: center; /* center all items */
 }
-
-
-//** LOGO ***//
 
 .logo img {
   position: absolute;
   left: 20px; /* adjust as needed */
   top: 50%;
   transform: translateY(-50%);
-  max-height: 70%;
+}
+
+.logo img {
+  max-height: 70%; /* or set a specific value like 60px */
   object-fit: contain;
 }
 
-//** PANEL LAYOUT - SPLIT ***//
-
+/* Panel layout (split screen) */
 main {
   display: flex;
-  flex: 1; /* Take all available space */
-  overflow: hidden; /* Hide overflow at this level */
+}
+main {
+  margin-top: 80px; /* Adjust based on header height */
+  margin-bottom: 60px; /* Adjust based on footer height */
 }
 
-
-//** FOOTER - FIXED AT BOTTOM ***//
-
+/* Footer: Fixed at the bottom */
 footer {
-  height: 80px;
-  background-color: #fff;
-  border-top: 2px solid #ccc;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff; /* White background */
+  z-index: 1000;
+  border-top: 1px solid #ccc;
   padding: 10px;
   text-align: right;
-  flex-shrink: 0; /* Prevent footer from shrinking */
 }
 
-//** PROGRESS BAR ***//
-
+/* Container that holds all steps */
 #progressBarContainer {
   display: flex;
   align-items: center;
@@ -83,47 +80,31 @@ footer {
   font-size: 18px;
 }
 
-//** PANEL - LEFT AND RIGHT ***//
-
 .panel {
-  overflow-y: auto; /* Only enable vertical scrolling on panels */
-  padding: 40px;
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto; /* If content is tall, it can scroll */
+  height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
-
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  margin-left: 40px;
-  margin-top: 40px;
+  
 }
-
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
 
-//** iFRAME ***//
 
-#docContent {
-  width: 100%;
-  height: 100%;
-  border: none;
-  padding: 20px;
-  line-height: 1.6;
-  overflow-y: auto; /* Changed from "right" to "auto" */
-}
 
+/* Iframe style */
 #docIframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-//** COMMENTS SECTION ***//
-
-
-
+/* Comments section */
 .comment-item {
   background: #fff;
   margin-top: 40px;
@@ -145,8 +126,6 @@ footer {
   font-size: 1em;
 }
 
-//** WITHIN COMMENTS, RESPONSE AREA ***//
-
 .response-area {
   margin-top: 20px;
   margin-bottom: 0px;
@@ -162,7 +141,7 @@ footer {
   font-size: 1em;
 }
 
-//** HOVER STATES ***//
+/***Hover States***/
 
 .comment-item:hover,
 .comment-item:hover .response-area,
@@ -170,7 +149,7 @@ footer {
   background-color: #F2F2F2;
 }
 
-//** NAME BUBBLE ***//
+/***NAME BUBBLE***/
 
 /* Enter Your Name... */
 .reviewer-name-item input {
@@ -193,8 +172,7 @@ footer {
   font-size: 1em;
 }
 
-//** BUTTON STYLE ***//
-
+/*** Button style ***/
 button {
   background: #706DEB; /*same as chatbot*/
   color: #fff;
@@ -204,13 +182,12 @@ button {
   border-radius: 30px;
   cursor: pointer;
 }
-
 button:hover {
   opacity: 0.9;
 }
 
-//** STATES AKA DIAMONDS ***//
 
+/* --- STATES (use these classes in your JS) --- */
 /* The diamond shape: a rotated square */
 .diamond {
   position: relative;
@@ -226,7 +203,6 @@ button:hover {
   border-radius: 4px;
   box-shadow: 0 0 0 2px #fff;
 }
-
 /* Gives a white inner radius */
 .diamond::after {
   content: "";
@@ -253,35 +229,35 @@ button:hover {
 .line {
   width: 60px;  /* length of line segment */
   height: 8px;  /* thickness of line */
-  background: #B7B9C0; /* default for "untouched" */
+  background: gray; /* default for "untouched" */
 }
 
 
-//** UNTOUCHED - GREY ***//
+/* UNTOUCHED (gray) */
 .step.untouched .diamond {
-  border-color: #B7B9C0;
+  border-color: gray;
 }
 .step.untouched .diamond span {
   color: gray;
 }
 .step.untouched .line {
-  background: #B7B9C0;
+  background: gray;
 }
 
-//** IN-PROGRESS - YELLOW ***//
+/* IN-PROGRESS (yellow) */
 .step.in-progress .diamond {
-  border-color: #e8eb6d;
+  border-color: gold;
 }
 .step.in-progress .diamond span {
-  color: gray;
+  color: gold;
 }
 .step.in-progress .line {
-  background: #e8eb6d;
+  background: gold;
 }
 
-//** COMPLETE - BLUE ***//
+/* COMPLETE (blue) */
 .step.complete .diamond {
-  border-color: #706DEB;
+  border-color: #706DEB; /* your "blue" from the chatbot */
 }
 .step.complete .diamond span {
   color: #706DEB;
@@ -290,8 +266,8 @@ button:hover {
   background: #706DEB;
 }
 
-//** MISC ***//
 
+/*MISC*/
 textarea {
   resize: vertical;
 }
