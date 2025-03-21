@@ -119,7 +119,7 @@ footer {
 .comment-number {
   display: inline-block;
   margin-right: 8px;
-  font-size: 1.2em;
+  font-size: 2em;
   vertical-align: middle;
   /* Optionally, adjust color, weight, etc. */
   color: #706DEB; /* Or any color that matches your design */
