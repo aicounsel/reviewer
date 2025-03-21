@@ -116,6 +116,15 @@ footer {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /*IMPORTANT*/
 }
 
+.comment-number {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+  /* Optionally, adjust color, weight, etc. */
+  color: #706DEB; /* Or any color that matches your design */
+}
+
 .comment-metadata {
   font-size: 0.6em;
   color: #666;
