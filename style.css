@@ -187,7 +187,7 @@ button {
       cursor: pointer;
     }
     
-    button:hover {
+    button:hover:not(:active) {
       opacity: 0.5;
       background: #706DEB;
       color: #fff;
