@@ -48,7 +48,6 @@ function injectHighlightStyle(iframeDoc) {
       background-color: #e8eb6d;
       transition: background-color 0.3s ease;
     }
-    /* Additional overrides for margins/padding if needed */
     body {
       margin: 40px !important;
       padding: 20px !important;
@@ -87,27 +86,22 @@ function renderProgressBar(comments) {
   progressBarContainer.innerHTML = ""; // Clear any existing content
 
   comments.forEach((comment, index) => {
-    // Create the container for this step with default state "untouched".
     const stepEl = document.createElement("div");
     stepEl.classList.add("step", "untouched");
 
-    // Create the diamond element.
     const diamondEl = document.createElement("div");
     diamondEl.classList.add("diamond");
 
-    // Create the white outline element inside the diamond.
     const outlineEl = document.createElement("div");
     outlineEl.classList.add("diamond-outline");
     diamondEl.appendChild(outlineEl);
 
-    // Create the span with the step number inside the diamond.
     const numSpan = document.createElement("span");
     numSpan.textContent = index + 1;
     diamondEl.appendChild(numSpan);
 
     stepEl.appendChild(diamondEl);
 
-    // If this is not the last step, add a connecting line.
     if (index < comments.length - 1) {
       const lineEl = document.createElement("div");
       lineEl.classList.add("line");
@@ -115,7 +109,6 @@ function renderProgressBar(comments) {
     }
 
     progressBarContainer.appendChild(stepEl);
-    // Save a reference for later updates.
     comment.stepElement = stepEl;
   });
 }
@@ -129,17 +122,15 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Create a header container for the fancy number and metadata.
+    // Create header container for the fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
-    // Fancy number (e.g., ➊, ➋, etc.).
     const numberSpan = document.createElement("span");
     numberSpan.classList.add("comment-number");
     numberSpan.textContent = String.fromCodePoint(0x278A + index);
     headerDiv.appendChild(numberSpan);
 
-    // Metadata: Author (without bracketed numbers) and formatted Date.
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
     const formattedDate = formatDate(comment.CommentDateTime);
@@ -149,27 +140,22 @@ function renderComments(comments) {
 
     commentItem.appendChild(headerDiv);
 
-    // Create comment text element.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Create the interaction area for responses.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
-    // Create a textarea for entering the response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
-    // Create a "Mark as Complete" button.
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // Event listeners.
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
@@ -222,17 +208,16 @@ function highlightDocumentText(textID, highlight) {
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
   const reviewerNameInput = document.getElementById("reviewerNameInput");
-
-  // Debug log to check if reviewerNameInput is present.
   console.log("Reviewer Name Input:", reviewerNameInput);
-
   if (!reviewerNameInput || !reviewerNameInput.value.trim()) {
     alert("Please enter your name.");
     return;
   }
 
-  // Validate that all comment responses (excluding the intro bubble) are filled.
-  const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
+  // Exclude both reviewer-name and intro bubbles.
+  const commentItems = document.querySelectorAll(
+    ".comment-item:not(.reviewer-name-item):not(.client-intro-bubble)"
+  );
   let allFilled = true;
   commentItems.forEach((item) => {
     const textarea = item.querySelector("textarea");
@@ -245,7 +230,6 @@ function handleSubmitAll() {
     return;
   }
 
-  // Re-fetch comments to build the submission payload.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -253,10 +237,14 @@ function handleSubmitAll() {
   })
     .then((res) => res.json())
     .then((allData) => {
-      const commentsForDoc = allData.Comments.filter(c => c.DocumentID === documentId);
+      const commentsForDoc = allData.Comments.filter(
+        (c) => c.DocumentID === documentId
+      );
 
-      // Collect responses from the DOM.
-      const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
+      // Exclude intro/reviewer-name bubbles.
+      const commentItems = document.querySelectorAll(
+        ".comment-item:not(.reviewer-name-item):not(.client-intro-bubble)"
+      );
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
         commentsForDoc[idx].response = textarea.value.trim();
@@ -264,7 +252,7 @@ function handleSubmitAll() {
 
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
-      const payloadComments = commentsForDoc.map(c => {
+      const payloadComments = commentsForDoc.map((c) => {
         if (c.response && c.response !== "") {
           responseIndex++;
           return {
@@ -275,7 +263,7 @@ function handleSubmitAll() {
             ResponseDateTime: new Date().toISOString(),
             ResponseTextID: `_cmntref${totalComments + responseIndex}`,
             ResponseTextHighlight: c.TextHighlight,
-            ResponseFullText: c.FullText
+            ResponseFullText: c.FullText,
           };
         } else {
           return {
@@ -286,23 +274,26 @@ function handleSubmitAll() {
             ResponseDateTime: "",
             ResponseTextID: "",
             ResponseTextHighlight: "",
-            ResponseFullText: ""
+            ResponseFullText: "",
           };
         }
       });
 
       const payload = {
         DocumentID: documentId,
-        Comments: payloadComments
+        Comments: payloadComments,
       };
 
       console.log("Submitting data to Power Automate:", payload);
 
-      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
+      fetch(
+        "https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      )
         .then(() => {
           alert("Responses submitted successfully!");
         })
@@ -330,9 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
-      // Inject the document font override.
       injectDocumentStyle(iframeDoc);
-      // Then inject your highlight and additional styles.
       injectHighlightStyle(iframeDoc);
     }
   });
