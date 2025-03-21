@@ -28,9 +28,21 @@ function injectDocumentStyle(iframeDoc) {
 
 // Inject CSS for highlighted text into the iframe.
 function injectHighlightStyle(iframeDoc) {
+  
+  // Add Roboto font link
+  const fontLink = iframeDoc.createElement("link");
+  fontLink.rel = "stylesheet";
+  fontLink.href = "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap";
+  iframeDoc.head.appendChild(fontLink); 
+  
+  // Add font override styles
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
-    html, body {
+    html, body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, a {
+      font-family: 'Roboto', sans-serif !important;
+    }
+    /* Override any elements with inline styles */
+    [style*="font-family"] {
       font-family: 'Roboto', sans-serif !important;
     }
     .highlighted-text {
