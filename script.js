@@ -19,8 +19,7 @@ function getDocumentIdFromUrl() {
 function injectHighlightStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
-    /* Override the body font-family for the iframe */
-    body {
+    html, body {
       font-family: 'Roboto', sans-serif !important;
     }
     .highlighted-text {
