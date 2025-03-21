@@ -41,13 +41,26 @@ function injectHighlightStyle(iframeDoc) {
     html, body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, a {
       font-family: 'Roboto', sans-serif !important;
     }
-    /* Override any elements with inline styles */
     [style*="font-family"] {
       font-family: 'Roboto', sans-serif !important;
     }
     .highlighted-text {
       background-color: yellow;
       transition: background-color 0.3s ease;
+    }
+        /* Add margins to the document body */
+    body {
+      margin: 40px !important;
+      padding: 20px !important;
+      max-width: 800px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    
+    /* If the content is inside a specific container, you might need this too */
+    .document-content, main, article, .content, #content, .document {
+      margin: 20px !important;
+      padding: 15px !important;
     }
   `;
   iframeDoc.head.appendChild(styleEl);
