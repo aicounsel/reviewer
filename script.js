@@ -296,13 +296,20 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.src = `./agreements/${documentId}.html`;
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
-    if (iframeDoc) {
- /* Override font for the entire document in the iframe */
+if (iframeDoc) {
+  // Create a style element for the font override.
+  const fontStyleEl = iframeDoc.createElement("style");
+  fontStyleEl.textContent = `
     body {
       font-family: 'Roboto', sans-serif !important;
     }
-      injectHighlightStyle(iframeDoc);
-    }
+  `;
+  // Append it to the iframe's head.
+  iframeDoc.head.appendChild(fontStyleEl);
+
+  // Then inject your highlight styles (or any additional styles).
+  injectHighlightStyle(iframeDoc);
+}
   });
 
   // 2. Insert Reviewer Name box above the comment container.
