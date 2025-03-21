@@ -96,6 +96,12 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
+    commentItem.addEventListener("mouseenter", () => {
+  highlightDocumentText(comment.TextID, true);
+});
+commentItem.addEventListener("mouseleave", () => {
+  highlightDocumentText(comment.TextID, false);
+});
     // Create metadata element (displaying Author and formatted Date).
 // Create metadata element (displaying Author and formatted Date).
 const metadataDiv = document.createElement("div");
