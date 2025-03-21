@@ -84,7 +84,6 @@ footer {
 .panel {
   flex: 1;
   padding: 20px;
-  overflow-y: auto; /* If content is tall, it can scroll */
   height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
 .left-panel {
@@ -94,9 +93,11 @@ footer {
   margin-left: 40px;
   margin-top: 40px;
   border-radius: 10px;
+  overflow-y: auto; /* If content is tall, it can scroll */
 }
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
+  overflow-y: auto; /* If content is tall, it can scroll */
 }
 
 /* Iframe style */
