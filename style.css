@@ -1,131 +1,46 @@
+
 /* Resets and basic styling */
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f9f9f9; /* Slight gray background to match minimal style */
+  font-family: 'Roboto', sans-serif;
+  background: #E5E8F0; /* not working */
   color: #333;
 }
+
 header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background-color: #fff; /* White background */
+   height: 100px; 
+  background-color: #fff;
   z-index: 1000;
   border-bottom: 1px solid #ccc;
   padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center all items */
 }
 
 .logo img {
-  height: 40px;
+  position: absolute;
+  left: 20px; /* adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-/* Progress bar container */
-#progressBarContainer {
-  margin-left: 20px;
-  display: flex;
-  align-items: center;
-}
-
-/* Example diamond style for progress steps */
-.step {
-  width: 30px;
-  height: 30px;
-  margin: 0 5px;
-  transform: rotate(45deg);
-  background-color: gray;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-.step span {
-  transform: rotate(-45deg);
-  font-size: 14px;
+.logo img {
+  max-height: 70%; /* or set a specific value like 60px */
+  object-fit: contain;
 }
 
 /* Panel layout (split screen) */
 main {
   display: flex;
 }
-.panel {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto; /* If content is tall, it can scroll */
-  height: calc(100vh - 80px); /* Adjust for header/footer height */
-}
-.left-panel {
-  background: #ffffff;
-  border-right: 1px solid #ccc;
-}
-.right-panel {
-  background: #f5f5f5;
-}
-
-/* Iframe style */
-#docIframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* Comments section */
-.comment-item {
-  background: #fff;
-  margin-bottom: 15px;
-  padding: 15px;
-  border-radius: 5px;
-  border-left: 4px solid #ccc;
-}
-.comment-item:hover {
-  border-left-color: #999;
-}
-.comment-metadata {
-  font-size: 0.9em;
-  color: #666;
-  margin-bottom: 5px;
-}
-.comment-text {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-.response-area {
-  margin-top: 10px;
-}
-.response-area textarea {
-  width: 100%;
-  min-height: 60px;
-}
-
-/* Button style */
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-button:hover {
-  opacity: 0.9;
-}
-
-/* Progress bar color states: .gray, .yellow, .blue */
-.step.gray {
-  background-color: gray;
-}
-.step.yellow {
-  background-color: gold;
-}
-.step.blue {
-  background-color: #007bff;
-}
-
 main {
   margin-top: 80px; /* Adjust based on header height */
   margin-bottom: 60px; /* Adjust based on footer height */
@@ -142,4 +57,210 @@ footer {
   border-top: 1px solid #ccc;
   padding: 10px;
   text-align: right;
+}
+
+/* Container that holds all steps */
+#progressBarContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center the bar horizontally */
+  /* you can add margin or padding here if needed */
+}
+
+/* Example diamond style for progress steps NOTE CHANGES */
+.step {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.step span {
+  transform: rotate(-45deg);
+  font-size: 18px;
+}
+
+.panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto; /* If content is tall, it can scroll */
+  height: calc(100vh - 80px); /* Adjust for header/footer height */
+}
+.left-panel {
+  background: #ffffff;
+  border-right: 2px solid #ccc;
+}
+.right-panel {
+  background: #E5E8F0; /*same as chatbot*/
+}
+
+/* Iframe style */
+#docIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Comments section */
+.comment-item {
+  background: #fff;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /*IMPORTANT*/
+}
+
+.comment-metadata {
+  font-size: 0.6em;
+  color: #666;
+  margin-bottom: 15px;
+  text-align: right !important; /*IMPORTANT*/
+}
+.comment-text {
+  /*font-weight: bold;*/
+  margin-bottom: 20px;
+  font-size: 1em;
+}
+
+.response-area {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  background-color: #fff;
+}
+
+.response-area textarea {
+  width: 100%;
+  min-height: 60px;
+  background-color: #fff; /*IMPORTANT*/
+  border-radius: 5px; /*IMPORTANT*/
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+}
+
+/***Hover States***/
+
+.comment-item:hover,
+.comment-item:hover .response-area,
+.comment-item .response-area:hover {
+  background-color: #F2F2F2;
+}
+
+/***NAME BUBBLE***/
+
+/* Enter Your Name... */
+.reviewer-name-item input {
+  width: 100%;
+  min-height: 40px;
+  background-color: #fff;
+  border-radius: 5px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+  border: 2px solid #ccc;
+  box-shadow: none;       
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* Your Name */
+.reviewer-name-item .response-area > div:first-child {
+  margin-bottom: 10px;
+  margin-top: -15px;
+  font-size: 1em;
+}
+
+/*** Button style ***/
+button {
+  background: #706DEB; /*same as chatbot*/
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  margin-top: 10px; /*IMPORTANT*/
+  border-radius: 30px;
+  cursor: pointer;
+}
+button:hover {
+  opacity: 0.9;
+}
+
+
+/* --- STATES (use these classes in your JS) --- */
+/* The diamond shape: a rotated square */
+.diamond {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  transform: rotate(45deg);
+  border: 3px solid gray; /* default color for "untouched" */
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px; /* small gap before the connecting line */
+}
+
+/* White outline behind the diamond's border */
+.diamond-outline {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid #fff; /* white gap */
+  border-radius: 2px;     /* slightly rounded corners if desired */
+}
+
+/* The step number inside the diamond (un-rotate it so it's readable) */
+.diamond span {
+  position: relative;
+  transform: rotate(-45deg);
+  font-size: 16px;
+  color: gray; /* default text color for "untouched" */
+}
+
+/* The line connecting to the next diamond */
+.line {
+  width: 60px;  /* length of line segment */
+  height: 8px;  /* thickness of line */
+  background: gray; /* default for "untouched" */
+}
+
+
+/* UNTOUCHED (gray) */
+.step.untouched .diamond {
+  border-color: gray;
+}
+.step.untouched .diamond span {
+  color: gray;
+}
+.step.untouched .line {
+  background: gray;
+}
+
+/* IN-PROGRESS (yellow) */
+.step.in-progress .diamond {
+  border-color: gold;
+}
+.step.in-progress .diamond span {
+  color: gold;
+}
+.step.in-progress .line {
+  background: gold;
+}
+
+/* COMPLETE (blue) */
+.step.complete .diamond {
+  border-color: #706DEB; /* your "blue" from the chatbot */
+}
+.step.complete .diamond span {
+  color: #706DEB;
+}
+.step.complete .line {
+  background: #706DEB;
+}
+
+
+/*MISC*/
+textarea {
+  resize: vertical;
 }
