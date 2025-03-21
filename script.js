@@ -17,7 +17,7 @@ function getDocumentIdFromUrl() {
 function injectHighlightStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = 
-    .highlighted-text {
+    highlighted-text {
       background-color: yellow;
       transition: background-color 0.3s ease;
     }
