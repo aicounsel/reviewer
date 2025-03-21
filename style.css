@@ -193,15 +193,27 @@ button:hover {
   width: 50px;
   height: 50px;
   transform: rotate(45deg);
-  border: 8px solid rgb(100, 100, 100); /* default color for "untouched" */
+  border: 7px solid rgb(100, 100, 100); /* default color for "untouched" */
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 4px; /* small gap before the connecting line */
-  border-radius: 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px #fff;
 }
-
+/* Gives a white inner radius */
+.diamond::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 4px solid white;
+  border-radius: inherit; /* matches the diamond's rounded corners */
+  pointer-events: none;
+}
 
 /* The step number inside the diamond (un-rotate it so it's readable) */
 .diamond span {
