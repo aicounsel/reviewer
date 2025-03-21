@@ -83,15 +83,20 @@ footer {
 
 .panel {
   flex: 1;
-  padding: 20px;
+  padding: 40px;
   overflow-y: auto; /* If content is tall, it can scroll */
   height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
+
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
-  
+  margin-left: 40px;
+  margin-top: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
 }
+
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
