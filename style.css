@@ -173,19 +173,40 @@ footer {
   font-size: 1em;
 }
 
-/*** Button style ***/
+/*** BUTTON STYLES ***/
+
 button {
-  background: #706DEB; /*same as chatbot*/
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
-  margin-top: 10px; /*IMPORTANT*/
-  border-radius: 30px;
-  cursor: pointer;
-}
-button:hover {
-  opacity: 0.9;
-}
+      background: #fff;
+      color: #706DEB;
+      border: 2px;
+      border: 2px solid #706DEB;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      opacity: 0.5;
+      background: #706DEB;
+      color: #fff;
+      border: 2px;
+      border: 2px solid #706DEB;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    button:focus {
+      background: #706DEB;
+      color: #fff;
+      padding: 10px 15px;
+      border: 2px solid #706DEB;
+      margin-top: 10px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
 
 
 /* --- STATES (use these classes in your JS) --- */
@@ -230,30 +251,30 @@ button:hover {
 .line {
   width: 60px;  /* length of line segment */
   height: 8px;  /* thickness of line */
-  background: gray; /* default for "untouched" */
+  background: #B7B9C0; /* default for "untouched" */
 }
 
 
 /* UNTOUCHED (gray) */
 .step.untouched .diamond {
-  border-color: gray;
+  border-color: #B7B9C0;
 }
 .step.untouched .diamond span {
   color: gray;
 }
 .step.untouched .line {
-  background: gray;
+  background: #B7B9C0;
 }
 
 /* IN-PROGRESS (yellow) */
 .step.in-progress .diamond {
-  border-color: gold;
+  border-color: #e8eb6d;
 }
 .step.in-progress .diamond span {
-  color: gold;
+  color: gray;
 }
 .step.in-progress .line {
-  background: gold;
+  background: #e8eb6d;
 }
 
 /* COMPLETE (blue) */
