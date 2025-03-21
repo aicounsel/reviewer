@@ -5,9 +5,8 @@
 }
 body {
   overflow: hidden; /* Removes the main page scroll bar */
-  height: 100vh; /*Claude told me*/
-  padding: 0; /*Claude told me*/
-  margin: 0;
+  padding: 20px; /*Claude told me 0px*/
+  margin: 20px; /*Claude told me 0px*/
   font-family: 'Roboto', sans-serif;
   background: #E5E8F0; /* not working */
   color: #333;
@@ -115,7 +114,6 @@ footer {
 
 #commentContainer {
   overflow: auto; /* Allow scrolling in the comment section if needed */
-  max-height: 100vh; /* Adjust based on your layout */
 }
 
 .comment-item {
