@@ -187,7 +187,7 @@ button {
       cursor: pointer;
     }
     
-    button:hover:not(:active) {
+    button:hover:not(:focus) {
       opacity: 0.5;
       background: #706DEB;
       color: #fff;
