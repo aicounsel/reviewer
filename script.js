@@ -297,6 +297,10 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
+ /* Override font for the entire document in the iframe */
+    body {
+      font-family: 'Roboto', sans-serif !important;
+    }
       injectHighlightStyle(iframeDoc);
     }
   });
