@@ -127,7 +127,8 @@ footer {
 }
 
 .comment-metadata {
-  display: inline-block;
+  display: block;
+  width: 100%;
   vertical-align: top;
   font-size: 0.6em;
   color: #666;
