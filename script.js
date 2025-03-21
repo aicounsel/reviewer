@@ -48,18 +48,13 @@ function injectHighlightStyle(iframeDoc) {
       background-color: #e8eb6d;
       transition: background-color 0.3s ease;
     }
-    /* Add margins to the document body */
+    /* Additional overrides for margins/padding if needed */
     body {
       margin: 40px !important;
       padding: 20px !important;
       max-width: 800px !important;
       margin-left: auto !important;
       margin-right: auto !important;
-    }
-    /* Additional container overrides (if needed) */
-    .document-content, main, article, .content, #content, .document {
-      margin: 20px !important;
-      padding: 15px !important;
     }
   `;
   iframeDoc.head.appendChild(styleEl);
@@ -119,9 +114,7 @@ function renderProgressBar(comments) {
       stepEl.appendChild(lineEl);
     }
 
-    // Attach the step element to the container.
     progressBarContainer.appendChild(stepEl);
-
     // Save a reference for later updates.
     comment.stepElement = stepEl;
   });
@@ -136,50 +129,47 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Header container for the fancy number + metadata.
+    // Create a header container for the fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
-    // Fancy number: ➊, ➋, etc.
+    // Fancy number (e.g., ➊, ➋, etc.).
     const numberSpan = document.createElement("span");
     numberSpan.classList.add("comment-number");
-    // For ➊ start: 0x278A + index => ➊, ➋, etc.
     numberSpan.textContent = String.fromCodePoint(0x278A + index);
     headerDiv.appendChild(numberSpan);
 
-    // Metadata (Author + Date).
+    // Metadata: Author (without bracketed numbers) and formatted Date.
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
     const formattedDate = formatDate(comment.CommentDateTime);
-    // Remove any bracketed numbers from author.
     const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
     metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
     headerDiv.appendChild(metadataDiv);
 
-    // Append the headerDiv to your commentItem.
     commentItem.appendChild(headerDiv);
 
-    // Comment text element.
+    // Create comment text element.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Interaction area for the response.
+    // Create the interaction area for responses.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
-    // Textarea for user response.
+    // Create a textarea for entering the response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
-    // "Mark as Complete" button.
+    // Create a "Mark as Complete" button.
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // Event listeners for focus, blur, and "Mark as Complete".
+    // Event listeners.
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
@@ -187,7 +177,6 @@ function renderComments(comments) {
       }
       highlightDocumentText(comment.TextID, true);
     });
-
     textarea.addEventListener("blur", () => {
       if (!textarea.value.trim()) {
         if (comment.stepElement && !comment.isComplete) {
@@ -197,7 +186,6 @@ function renderComments(comments) {
       }
       highlightDocumentText(comment.TextID, false);
     });
-
     completeBtn.addEventListener("click", () => {
       comment.response = textarea.value.trim();
       comment.isComplete = true;
@@ -206,8 +194,8 @@ function renderComments(comments) {
         comment.stepElement.classList.add("complete");
       }
     });
-
     responseDiv.appendChild(completeBtn);
+
     commentItem.appendChild(responseDiv);
     commentContainer.appendChild(commentItem);
   });
@@ -220,10 +208,8 @@ function highlightDocumentText(textID, highlight) {
   const docIframe = document.getElementById("docIframe");
   const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
   if (!iframeDoc) return;
-
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
-
   if (highlight) {
     anchor.classList.add("highlighted-text");
     anchor.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -235,14 +221,17 @@ function highlightDocumentText(textID, highlight) {
 // Handle "Submit All" button click.
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
-  // Make sure the "Your Name" bubble is in the DOM and has an ID of reviewerNameInput.
   const reviewerNameInput = document.getElementById("reviewerNameInput");
+
+  // Debug log to check if reviewerNameInput is present.
+  console.log("Reviewer Name Input:", reviewerNameInput);
+
   if (!reviewerNameInput || !reviewerNameInput.value.trim()) {
     alert("Please enter your name.");
     return;
   }
 
-  // Validate that all comment responses (excluding the intro bubble / name bubble) are filled.
+  // Validate that all comment responses (excluding the intro bubble) are filled.
   const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
   let allFilled = true;
   commentItems.forEach((item) => {
@@ -264,11 +253,9 @@ function handleSubmitAll() {
   })
     .then((res) => res.json())
     .then((allData) => {
-      const commentsForDoc = allData.Comments.filter(
-        (c) => c.DocumentID === documentId
-      );
+      const commentsForDoc = allData.Comments.filter(c => c.DocumentID === documentId);
 
-      // Collect responses from DOM.
+      // Collect responses from the DOM.
       const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
@@ -277,8 +264,7 @@ function handleSubmitAll() {
 
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
-
-      const payloadComments = commentsForDoc.map((c) => {
+      const payloadComments = commentsForDoc.map(c => {
         if (c.response && c.response !== "") {
           responseIndex++;
           return {
@@ -289,7 +275,7 @@ function handleSubmitAll() {
             ResponseDateTime: new Date().toISOString(),
             ResponseTextID: `_cmntref${totalComments + responseIndex}`,
             ResponseTextHighlight: c.TextHighlight,
-            ResponseFullText: c.FullText,
+            ResponseFullText: c.FullText
           };
         } else {
           return {
@@ -300,26 +286,23 @@ function handleSubmitAll() {
             ResponseDateTime: "",
             ResponseTextID: "",
             ResponseTextHighlight: "",
-            ResponseFullText: "",
+            ResponseFullText: ""
           };
         }
       });
 
       const payload = {
         DocumentID: documentId,
-        Comments: payloadComments,
+        Comments: payloadComments
       };
 
       console.log("Submitting data to Power Automate:", payload);
 
-      fetch(
-        "https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      )
+      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
         .then(() => {
           alert("Responses submitted successfully!");
         })
@@ -344,7 +327,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. Set the iframe source to the matching HTML in /agreements.
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
-
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
@@ -357,12 +339,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 2. Insert the Intro Message bubble at the top of the comment container.
   const commentContainer = document.getElementById("commentContainer");
-  
   const introDiv = document.createElement("div");
   introDiv.classList.add("comment-item", "client-intro-bubble");
   const introContent = document.createElement("div");
   introContent.classList.add("intro-content");
-  // Use a placeholder for the dynamic comment count.
   introContent.innerHTML = `
     <p>Welcome to AI Counsel! 👋</p>
     <p>I'm your Client Assistant and your attorney has some questions for you on your contract. A few quick notes:</p>
@@ -380,26 +360,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. Insert the "Your Name" bubble immediately below the intro bubble.
   const reviewerNameDiv = document.createElement("div");
   reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
-  
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
-
   const nameLabel = document.createElement("div");
   nameLabel.textContent = "Let's start with your name:";
-  
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
   nameInput.required = true;
   nameInput.style.width = "100%";
   nameInput.style.marginBottom = "10px";
-
-  // Append label and input to the name bubble.
   nameResponseDiv.appendChild(nameLabel);
   nameResponseDiv.appendChild(nameInput);
   reviewerNameDiv.appendChild(nameResponseDiv);
-
-  // Insert the "Your Name" bubble right after the intro bubble.
   introDiv.insertAdjacentElement("afterend", reviewerNameDiv);
 
   // 4. Fetch comments from Power Automate.
@@ -418,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (commentCountElem) {
         commentCountElem.textContent = commentsForDoc.length;
       }
-
+      
       renderProgressBar(commentsForDoc);
       renderComments(commentsForDoc);
     })
@@ -427,7 +400,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // 5. Set up the "Submit All" button.
-  document
-    .getElementById("submitAllBtn")
-    .addEventListener("click", handleSubmitAll);
+  const submitBtn = document.getElementById("submitAllBtn");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", handleSubmitAll);
+  } else {
+    console.error("No submitAllBtn found in the DOM.");
+  }
 });
