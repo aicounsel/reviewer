@@ -97,11 +97,14 @@ function renderComments(comments) {
     commentItem.classList.add("comment-item");
 
     // Create metadata element (displaying Author and formatted Date).
-    const metadataDiv = document.createElement("div");
-    metadataDiv.classList.add("comment-metadata");
-    const formattedDate = formatDate(comment.CommentDateTime);
-    metadataDiv.textContent = `Author: ${comment.CommentAuthor} | Date: ${formattedDate}`;
-    commentItem.appendChild(metadataDiv);
+// Create metadata element (displaying Author and formatted Date).
+const metadataDiv = document.createElement("div");
+metadataDiv.classList.add("comment-metadata");
+const formattedDate = formatDate(comment.CommentDateTime);
+// Remove any bracketed number (e.g., " [3]") from the author name.
+const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
+metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
+commentItem.appendChild(metadataDiv);
 
     // Create comment text element.
     const textDiv = document.createElement("div");
