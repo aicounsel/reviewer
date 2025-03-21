@@ -1,12 +1,11 @@
 
+
 /* Resets and basic styling */
 * {
   box-sizing: border-box;
 }
 body {
-  overflow: hidden; /* Removes the main page scroll bar */
-  padding: 20px; /*Claude told me 0px*/
-  margin: 20px; /*Claude told me 0px*/
+  margin: 0;
   font-family: 'Roboto', sans-serif;
   background: #E5E8F0; /* not working */
   color: #333;
@@ -87,35 +86,25 @@ footer {
   overflow-y: auto; /* If content is tall, it can scroll */
   height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
-
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
-      display: flex; /*claude*/
-    flex-direction: column; /*claude*/
-    height: 100vh; /*claude*/
-    overflow: hidden; /*claude*/ 
+  
 }
-
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
 
+
+
 /* Iframe style */
 #docIframe {
-  flex: 1; /*claude told me*/
   width: 100%;
   height: 100%;
   border: none;
-  overflow: auto; /*This is the only scroll bar we want to keep */
 }
 
 /* Comments section */
-
-#commentContainer {
-  overflow: auto; /* Allow scrolling in the comment section if needed */
-}
-
 .comment-item {
   background: #fff;
   margin-top: 40px;
@@ -146,8 +135,8 @@ footer {
 .response-area textarea {
   width: 100%;
   min-height: 60px;
-  background-color: #fff; 
-  border-radius: 5px;
+  background-color: #fff; /*IMPORTANT*/
+  border-radius: 5px; /*IMPORTANT*/
   font-family: 'Roboto', sans-serif;
   font-size: 1em;
 }
@@ -189,13 +178,14 @@ button {
   color: #fff;
   border: none;
   padding: 10px 15px;
-  margin-top: 10px;
+  margin-top: 10px; /*IMPORTANT*/
   border-radius: 30px;
   cursor: pointer;
 }
 button:hover {
   opacity: 0.9;
 }
+
 
 /* --- STATES (use these classes in your JS) --- */
 /* The diamond shape: a rotated square */
@@ -281,4 +271,3 @@ button:hover {
 textarea {
   resize: vertical;
 }
-
