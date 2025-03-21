@@ -251,7 +251,7 @@ button {
       cursor: pointer;
     }
 #submitAllBtn {
-  padding-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 /* --- STATES (use these classes in your JS) --- */
