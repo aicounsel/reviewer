@@ -326,7 +326,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
   docIframe.addEventListener("load", () => {
-    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
+    const iframeDoc =
+      docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
       // Inject the document font override.
       injectDocumentStyle(iframeDoc);
@@ -335,14 +336,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 2. Insert the Intro Message bubble (replacing the previous "Your Name" box)
-  // (If you want to keep the "Your Name" box, you can remove this section.)
-  // For this example, we'll assume you're adding an intro message.
+  // 2. Insert the Intro Message bubble at the top of the comment container.
+  const commentContainer = document.getElementById("commentContainer");
+  
   const introDiv = document.createElement("div");
   introDiv.classList.add("comment-item", "client-intro-bubble");
   const introContent = document.createElement("div");
   introContent.classList.add("intro-content");
-  // Use the dynamic comment count later, for now we'll use a placeholder.
+  // Use a placeholder for the dynamic comment count.
   introContent.innerHTML = `
     <p>Welcome to AI Counsel! 👋</p>
     <p>I'm your Client Assistant and your attorney has some questions for you on your contract. A few quick notes:</p>
@@ -355,22 +356,40 @@ document.addEventListener("DOMContentLoaded", () => {
     <p>Ready to get started?</p>
   `;
   introDiv.appendChild(introContent);
-  // Insert the intro bubble at the top of the comment container.
-  const commentContainer = document.getElementById("commentContainer");
   commentContainer.insertAdjacentElement("afterbegin", introDiv);
 
-  // 3. Fetch comments from Power Automate.
+  // 3. Insert the "Your Name" bubble immediately below the intro bubble.
+  const reviewerNameDiv = document.createElement("div");
+  reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
+  const nameResponseDiv = document.createElement("div");
+  nameResponseDiv.classList.add("response-area");
+  const nameLabel = document.createElement("div");
+  nameLabel.textContent = "Your Name";
+  nameLabel.style.fontWeight = "bold";  // or adjust as needed
+  const nameInput = document.createElement("input");
+  nameInput.placeholder = "Enter Your Name...";
+  nameInput.id = "reviewerNameInput";
+  nameInput.required = true;
+  nameInput.style.width = "100%";
+  nameInput.style.marginBottom = "10px";
+  nameResponseDiv.appendChild(nameLabel);
+  nameResponseDiv.appendChild(nameInput);
+  reviewerNameDiv.appendChild(nameResponseDiv);
+  // Insert the reviewer name bubble right after the intro bubble.
+  introDiv.insertAdjacentElement("afterend", reviewerNameDiv);
+
+  // 4. Fetch comments from Power Automate.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ DocumentID: documentId })
+    body: JSON.stringify({ DocumentID: documentId }),
   })
     .then((res) => res.json())
     .then((data) => {
       console.log("Fetched data:", data);
       const commentsForDoc = data.Comments || [];
-
-      // Update the intro bubble with the correct number of comments.
+      
+      // Update the intro bubble with the correct comment count.
       const commentCountElem = document.querySelector(".client-intro-bubble .comment-count");
       if (commentCountElem) {
         commentCountElem.textContent = commentsForDoc.length;
@@ -383,6 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching comments:", err);
     });
 
-  // 4. Set up the "Submit All" button.
+  // 5. Set up the "Submit All" button.
   document.getElementById("submitAllBtn").addEventListener("click", handleSubmitAll);
 });
