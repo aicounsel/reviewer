@@ -3,21 +3,23 @@
  * Reviewer Portal
  *************************************************/
 
-const COMMENTS_URL = "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
+// --- CONSTANTS & HELPER FUNCTIONS ---
 
-// Helper: Extract DocumentID from the query string (?documentId=XYZ)
+// Power Automate endpoint for fetching comments.
+const COMMENTS_URL =
+  "https://prod-15.westus.logic.azure.com:443/workflows/318e9ff4339b4f6e8527a2ab74027c0d/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8Wg9umOg3LnKsvTvCTSIB6XtntGYjiW8iKU4XGs9xWM";
+
+// Extract DocumentID from the query string (?documentId=XYZ)
 function getDocumentIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("documentId");
 }
 
-/**
- * Inject CSS for highlighted text into the iframe.
- */
+// Inject CSS for highlighted text into the iframe.
 function injectHighlightStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
-  styleEl.textContent = 
-    highlighted-text {
+  styleEl.textContent = `
+    .highlighted-text {
       background-color: yellow;
       transition: background-color 0.3s ease;
     }
@@ -25,9 +27,7 @@ function injectHighlightStyle(iframeDoc) {
   iframeDoc.head.appendChild(styleEl);
 }
 
-/**
- * Helper: Format date string into "M/D/YYYY h:mm AM/PM" format.
- */
+// Format date string into "M/D/YYYY h:mm AM/PM" format.
 function formatDate(dateString) {
   const date = new Date(dateString);
   if (isNaN(date)) {
@@ -46,86 +46,74 @@ function formatDate(dateString) {
     .replace(",", "");
 }
 
-/**
- * Render the progress bar in #progressBarContainer.
- */
+// --- RENDERING FUNCTIONS ---
+
+// Render the diamond-based progress bar in #progressBarContainer.
 function renderProgressBar(comments) {
   const progressBarContainer = document.getElementById("progressBarContainer");
-  progressBarContainer.innerHTML = ""; // Clear existing
+  progressBarContainer.innerHTML = ""; // Clear any existing content
 
   comments.forEach((comment, index) => {
-    // Create a container for this step
+    // Create the container for this step and set default state as "untouched".
     const stepEl = document.createElement("div");
-    // By default, let's treat new steps as "untouched" (gray)
     stepEl.classList.add("step", "untouched");
 
-    // Create the diamond
+    // Create the diamond element.
     const diamondEl = document.createElement("div");
     diamondEl.classList.add("diamond");
 
-    // The white outline inside the diamond
+    // Create the white outline element inside the diamond.
     const outlineEl = document.createElement("div");
     outlineEl.classList.add("diamond-outline");
     diamondEl.appendChild(outlineEl);
 
-    // The number inside the diamond
+    // Create the span with the step number inside the diamond.
     const numSpan = document.createElement("span");
-    // If you want "01", "02", etc., do:
-    // numSpan.textContent = String(index + 1).padStart(2, "0");
-    // Otherwise, just do:
-    numSpan.textContent = index + 1;
+    numSpan.textContent = index + 1; // or padStart if needed
     diamondEl.appendChild(numSpan);
 
     stepEl.appendChild(diamondEl);
 
-    // If this is NOT the last comment, add a connecting line
+    // If this is not the last step, add a connecting line.
     if (index < comments.length - 1) {
       const lineEl = document.createElement("div");
       lineEl.classList.add("line");
       stepEl.appendChild(lineEl);
     }
 
-    // Append step to container
     progressBarContainer.appendChild(stepEl);
-
-    // Store reference so you can update this step's color in your JS
+    // Save a reference for later updates.
     comment.stepElement = stepEl;
   });
 }
 
-/**
- * Render comments and their interaction boxes in #commentContainer.
- */
+// Render comments and their interaction boxes in #commentContainer.
 function renderComments(comments) {
-  // Reviewer Name box is already inserted at the top.
   const commentContainer = document.getElementById("commentContainer");
-
-  // Log the comments array to help debug.
   console.log("Rendering comments:", comments);
 
-  // Loop over each comment.
   comments.forEach((comment) => {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Comment metadata (without the ID and with formatted date).
+    // Create metadata element (displaying Author and formatted Date).
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
     const formattedDate = formatDate(comment.CommentDateTime);
     metadataDiv.textContent = `Author: ${comment.CommentAuthor} | Date: ${formattedDate}`;
     commentItem.appendChild(metadataDiv);
 
-    // Comment text.
+    // Create comment text element.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Interaction box for responses.
+    // Create interaction area for response.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
-    // Create a textarea for entering the response.
+    // Create a textarea for user response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
     textarea.required = true;
@@ -135,18 +123,20 @@ function renderComments(comments) {
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // Event listeners for focus, blur, and button click.
-   textarea.addEventListener("focus", () => {
-  if (comment.stepElement) {
-  comment.stepElement.classList.remove("in-progress", "complete");
- comment.stepElement.classList.add("untouched");
-  }
-});
+    // --- Event Listeners for interaction ---
+    textarea.addEventListener("focus", () => {
+      if (comment.stepElement) {
+        // Remove "untouched" and "complete", then add "in-progress".
+        comment.stepElement.classList.remove("untouched", "complete");
+        comment.stepElement.classList.add("in-progress");
+      }
+      highlightDocumentText(comment.TextID, true);
+    });
     textarea.addEventListener("blur", () => {
       if (!textarea.value.trim()) {
         if (comment.stepElement && !comment.isComplete) {
-          comment.stepElement.classList.remove("untouched", "complete");
-        comment.stepElement.classList.add("in-progress");
+          comment.stepElement.classList.remove("in-progress", "complete");
+          comment.stepElement.classList.add("untouched");
         }
       }
       highlightDocumentText(comment.TextID, false);
@@ -155,10 +145,12 @@ function renderComments(comments) {
       comment.response = textarea.value.trim();
       comment.isComplete = true;
       if (comment.stepElement) {
-     comment.stepElement.classList.remove("in-progress", "complete");
-     comment.stepElement.classList.add("untouched");
+        // Remove "untouched" and "in-progress", then add "complete".
+        comment.stepElement.classList.remove("untouched", "in-progress");
+        comment.stepElement.classList.add("complete");
       }
     });
+    // Append the button to the response area.
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
@@ -166,13 +158,12 @@ function renderComments(comments) {
   });
 }
 
-/**
- * Highlights or un-highlights text in the loaded iframe.
- */
+// --- UTILITY FUNCTIONS ---
+
+// Highlight or un-highlight text in the loaded iframe.
 function highlightDocumentText(textID, highlight) {
   const docIframe = document.getElementById("docIframe");
-  const iframeDoc =
-    docIframe.contentDocument || docIframe.contentWindow.document;
+  const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
   if (!iframeDoc) return;
   const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
   if (!anchor) return;
@@ -184,24 +175,17 @@ function highlightDocumentText(textID, highlight) {
   }
 }
 
-/**
- * Called when user clicks "Submit All Answers".
- * Validates that all fields are filled in, then gathers responses and sends them to the Power Automate flow.
- */
+// Handle "Submit All" button click.
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
-
-  // Validate reviewer name is provided.
   const reviewerNameInput = document.getElementById("reviewerNameInput");
   if (!reviewerNameInput.value.trim()) {
     alert("Please enter your name.");
     return;
   }
 
-  // Validate that all comment responses are filled.
-  const commentItems = document.querySelectorAll(
-    ".comment-item:not(.reviewer-name-item)"
-  );
+  // Validate that all comment responses (excluding the reviewer name box) are filled.
+  const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
   let allFilled = true;
   commentItems.forEach((item) => {
     const textarea = item.querySelector("textarea");
@@ -214,7 +198,7 @@ function handleSubmitAll() {
     return;
   }
 
-  // Re-fetch the comments to build the submission payload.
+  // Re-fetch comments to build the submission payload.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -222,26 +206,19 @@ function handleSubmitAll() {
   })
     .then((res) => res.json())
     .then((allData) => {
-      const commentsForDoc = allData.Comments.filter(
-        (c) => c.DocumentID === documentId
-      );
+      const commentsForDoc = allData.Comments.filter(c => c.DocumentID === documentId);
 
-      // Collect responses from the DOM.
-      const commentItems = document.querySelectorAll(
-        ".comment-item:not(.reviewer-name-item)"
-      );
+      // Collect responses from DOM.
+      const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
       commentItems.forEach((item, idx) => {
         const textarea = item.querySelector("textarea");
-        const textVal = textarea.value.trim();
-        commentsForDoc[idx].response = textVal;
+        commentsForDoc[idx].response = textarea.value.trim();
       });
 
-      // Compute total number of comments.
       const totalComments = commentsForDoc.length;
       let responseIndex = 0;
 
-      // Build payload including computed response details.
-      const payloadComments = commentsForDoc.map((c) => {
+      const payloadComments = commentsForDoc.map(c => {
         if (c.response && c.response !== "") {
           responseIndex++;
           return {
@@ -275,15 +252,11 @@ function handleSubmitAll() {
 
       console.log("Submitting data to Power Automate:", payload);
 
-      // POST the payload to the update flow.
-      fetch(
-        "https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }
-      )
+      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
         .then(() => {
           alert("Responses submitted successfully!");
         })
@@ -297,30 +270,25 @@ function handleSubmitAll() {
     });
 }
 
-// Main code: run after DOM loads.
+// --- MAIN EXECUTION: Run After DOM Loads ---
 document.addEventListener("DOMContentLoaded", () => {
   const documentId = getDocumentIdFromUrl();
-
-  // If no DocumentID is provided, alert and exit.
   if (!documentId) {
     alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
     return;
   }
 
-  // 1. Set the iframe source to the matching .html in /agreements
+  // 1. Set the iframe source to the matching HTML in /agreements.
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
-
-  // 2. Once the iframe finishes loading, inject CSS for .highlighted-text
   docIframe.addEventListener("load", () => {
-    const iframeDoc =
-      docIframe.contentDocument || docIframe.contentWindow.document;
+    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
       injectHighlightStyle(iframeDoc);
     }
   });
 
-  // 3. Insert Reviewer Name interaction box above the first comment box.
+  // 2. Insert Reviewer Name box above the comment container.
   const reviewerNameDiv = document.createElement("div");
   reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
   const nameResponseDiv = document.createElement("div");
@@ -339,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const commentContainer = document.getElementById("commentContainer");
   commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
 
-  // 4. Fetch comments from Power Automate.
+  // 3. Fetch comments from Power Automate.
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -356,8 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching comments:", err);
     });
 
-  // 5. Set up "Submit All" button with required-field validation.
-  document
-    .getElementById("submitAllBtn")
-    .addEventListener("click", handleSubmitAll);
+  // 4. Set up the "Submit All" button.
+  document.getElementById("submitAllBtn").addEventListener("click", handleSubmitAll);
 });
