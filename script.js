@@ -173,13 +173,24 @@ function renderComments(comments) {
       highlightDocumentText(comment.TextID, false);
     });
     completeBtn.addEventListener("click", () => {
-      comment.response = textarea.value.trim();
-      comment.isComplete = true;
-      if (comment.stepElement) {
-        comment.stepElement.classList.remove("untouched", "in-progress");
-        comment.stepElement.classList.add("complete");
-      }
-    });
+  // If the comment is already complete, toggle back to in-progress
+  if (comment.isComplete) {
+    comment.isComplete = false;
+    // Switch the state from complete to in-progress
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("complete");
+      comment.stepElement.classList.add("in-progress");
+    }
+  } else {
+    // Mark the comment as complete
+    comment.response = textarea.value.trim();
+    comment.isComplete = true;
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("untouched", "in-progress");
+      comment.stepElement.classList.add("complete");
+    }
+  }
+});
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
