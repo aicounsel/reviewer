@@ -52,15 +52,44 @@ function formatDate(dateString) {
 function renderProgressBar(comments) {
   const progressBarContainer = document.getElementById("progressBarContainer");
   progressBarContainer.innerHTML = ""; // Clear existing
+
   comments.forEach((comment, index) => {
-    const stepDiv = document.createElement("div");
-    stepDiv.classList.add("step", "gray"); // Default color: gray
-    const stepLabel = document.createElement("span");
-    stepLabel.textContent = index + 1;
-    stepDiv.appendChild(stepLabel);
-    progressBarContainer.appendChild(stepDiv);
-    // Store reference for later color updates.
-    comment.stepElement = stepDiv;
+    // Create a container for this step
+    const stepEl = document.createElement("div");
+    // By default, let's treat new steps as "untouched" (gray)
+    stepEl.classList.add("step", "untouched");
+
+    // Create the diamond
+    const diamondEl = document.createElement("div");
+    diamondEl.classList.add("diamond");
+
+    // The white outline inside the diamond
+    const outlineEl = document.createElement("div");
+    outlineEl.classList.add("diamond-outline");
+    diamondEl.appendChild(outlineEl);
+
+    // The number inside the diamond
+    const numSpan = document.createElement("span");
+    // If you want "01", "02", etc., do:
+    // numSpan.textContent = String(index + 1).padStart(2, "0");
+    // Otherwise, just do:
+    numSpan.textContent = index + 1;
+    diamondEl.appendChild(numSpan);
+
+    stepEl.appendChild(diamondEl);
+
+    // If this is NOT the last comment, add a connecting line
+    if (index < comments.length - 1) {
+      const lineEl = document.createElement("div");
+      lineEl.classList.add("line");
+      stepEl.appendChild(lineEl);
+    }
+
+    // Append step to container
+    progressBarContainer.appendChild(stepEl);
+
+    // Store reference so you can update this step's color in your JS
+    comment.stepElement = stepEl;
   });
 }
 
@@ -107,18 +136,17 @@ function renderComments(comments) {
     completeBtn.textContent = "Mark as Complete";
 
     // Event listeners for focus, blur, and button click.
-    textarea.addEventListener("focus", () => {
-      if (comment.stepElement) {
-        comment.stepElement.classList.remove("gray", "blue");
-        comment.stepElement.classList.add("yellow");
-      }
-      highlightDocumentText(comment.TextID, true);
-    });
+   textarea.addEventListener("focus", () => {
+  if (comment.stepElement) {
+  comment.stepElement.classList.remove("in-progress", "complete");
+ comment.stepElement.classList.add("untouched");
+  }
+});
     textarea.addEventListener("blur", () => {
       if (!textarea.value.trim()) {
         if (comment.stepElement && !comment.isComplete) {
-          comment.stepElement.classList.remove("yellow", "blue");
-          comment.stepElement.classList.add("gray");
+          comment.stepElement.classList.remove("untouched", "complete");
+        comment.stepElement.classList.add("in-progress");
         }
       }
       highlightDocumentText(comment.TextID, false);
@@ -127,8 +155,8 @@ function renderComments(comments) {
       comment.response = textarea.value.trim();
       comment.isComplete = true;
       if (comment.stepElement) {
-        comment.stepElement.classList.remove("gray", "yellow");
-        comment.stepElement.classList.add("blue");
+     comment.stepElement.classList.remove("in-progress", "complete");
+     comment.stepElement.classList.add("untouched");
       }
     });
     responseDiv.appendChild(completeBtn);
