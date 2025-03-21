@@ -130,17 +130,18 @@ function renderComments(comments) {
   const commentContainer = document.getElementById("commentContainer");
   console.log("Rendering comments:", comments);
 
-  comments.forEach((comment) => {
+  // Loop over each comment with its index.
+  comments.forEach((comment, index) => {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Add hover events for highlighting document text.
-    commentItem.addEventListener("mouseenter", () => {
-      highlightDocumentText(comment.TextID, true);
-    });
-    commentItem.addEventListener("mouseleave", () => {
-      highlightDocumentText(comment.TextID, false);
-    });
+    // Create a span for the fancy number.
+    const numberSpan = document.createElement("span");
+    numberSpan.classList.add("comment-number");
+    // Unicode for ➊ is 0x278A. This computes the correct number.
+    numberSpan.textContent = String.fromCodePoint(0x278A + index);
+    // Append the numberSpan as the first element of commentItem.
+    commentItem.appendChild(numberSpan);
 
     // Create metadata element (displaying Author and formatted Date).
     const metadataDiv = document.createElement("div");
@@ -156,11 +157,11 @@ function renderComments(comments) {
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Create interaction area for response.
+    // Create interaction area for responses.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
-    // Create a textarea for user response.
+    // Create a textarea for entering the response.
     const textarea = document.createElement("textarea");
     textarea.placeholder = "Your response here...";
     textarea.required = true;
@@ -170,7 +171,7 @@ function renderComments(comments) {
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // --- Event Listeners for interaction ---
+    // Event listeners for focus, blur, and button click.
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
