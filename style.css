@@ -10,26 +10,24 @@ body {
   font-family: 'Roboto', sans-serif;
   background: #E5E8F0;
   color: #333;
-  height: 100vh; /*claude*/
-  overflow: hidden; /*removes browser scroll bar*/
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 
 //** HEADER - FIXED AT TOP ***//
 
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100px; 
+  height: 100px;
   background-color: #fff;
-  z-index: 1000;
   border-bottom: 2px solid #ccc;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: center; /* center all items */
+  justify-content: center;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
 
@@ -47,25 +45,21 @@ header {
 //** PANEL LAYOUT - SPLIT ***//
 
 main {
-  display: flex; /*2 panels*/
-  margin-top: 80px; /* Adjust based on header height */
-  margin-bottom: 80px; /* Adjust based on footer height */
+  display: flex;
+  flex: 1; /* Take all available space */
+  overflow: hidden; /* Hide overflow at this level */
 }
 
 
 //** FOOTER - FIXED AT BOTTOM ***//
 
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #fff; /* White background */
-  z-index: 1000;
+  height: 80px;
+  background-color: #fff;
   border-top: 2px solid #ccc;
   padding: 10px;
   text-align: right;
-  height: 80px;
+  flex-shrink: 0; /* Prevent footer from shrinking */
 }
 
 //** PROGRESS BAR ***//
@@ -92,10 +86,8 @@ footer {
 //** PANEL - LEFT AND RIGHT ***//
 
 .panel {
-  flex: 1;
+  overflow-y: auto; /* Only enable vertical scrolling on panels */
   padding: 40px;
-  overflow-y: auto; /* If content is tall, it can scroll */
-  height: calc(100vh - 80px); /* Adjust for header/footer height */
 }
 
 .left-panel {
@@ -114,14 +106,14 @@ footer {
 //** iFRAME ***//
 
 #docContent {
- width: 100%;
- height: 100%;
- border: none;
- padding: 20px;
- line-height: 1.6;
- overflow-y: right; /*not sure about this trying to get the scroll bar to the right*/
-  
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 20px;
+  line-height: 1.6;
+  overflow-y: auto; /* Changed from "right" to "auto" */
 }
+
 #docIframe {
   width: 100%;
   height: 100%;
