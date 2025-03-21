@@ -116,24 +116,23 @@ footer {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /*IMPORTANT*/
 }
 
+.comment-header {
+  display: flex;
+  align-items: flex-start; /* Top-align children */
+  justify-content: space-between; /* Push the number to the left, metadata to the right */
+  margin-bottom: 10px; /* Adjust spacing as needed */
+}
+
 .comment-number {
-  display: inline-block;
-  vertical-align: top;
   margin-right: 8px;
   font-size: 2em;
-  vertical-align: middle;
-  /* Optionally, adjust color, weight, etc. */
   color: #706DEB; /* Or any color that matches your design */
 }
 
 .comment-metadata {
-  display: block;
-  width: 100%;
-  vertical-align: top;
   font-size: 0.6em;
   color: #666;
   margin-bottom: 15px;
-  text-align: right !important; /*IMPORTANT*/
 }
 .comment-text {
   /*font-weight: bold;*/
