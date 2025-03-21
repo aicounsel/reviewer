@@ -15,6 +15,17 @@ function getDocumentIdFromUrl() {
   return params.get("documentId");
 }
 
+// Force Roboto into iFrame
+function injectDocumentStyle(iframeDoc) {
+  const styleEl = iframeDoc.createElement("style");
+  styleEl.textContent = `
+    html, body {
+      font-family: 'Roboto', sans-serif !important;
+    }
+  `;
+  iframeDoc.head.appendChild(styleEl);
+}
+
 // Inject CSS for highlighted text into the iframe.
 function injectHighlightStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
@@ -296,16 +307,9 @@ document.addEventListener("DOMContentLoaded", () => {
   docIframe.addEventListener("load", () => {
     const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
 if (iframeDoc) {
-  // Create a style element for the font override.
-  const fontStyleEl = iframeDoc.createElement("style");
-  fontStyleEl.textContent = `
-    body {
-      font-family: 'Roboto', sans-serif !important;
-    }
-  `;
-  // Append it to the iframe's head.
-  iframeDoc.head.appendChild(fontStyleEl);
-
+  // Inject the document font override.
+  injectDocumentStyle(iframeDoc);
+  
   // Then inject your highlight styles (or any additional styles).
   injectHighlightStyle(iframeDoc);
 }
