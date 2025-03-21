@@ -17,14 +17,11 @@ header {
   top: 0;
   left: 0;
   right: 0;
-   height: 100px; 
+  height: 80px; /* Set your desired header height */
   background-color: #fff;
   z-index: 1000;
   border-bottom: 1px solid #ccc;
   padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* center all items */
 }
 
 .logo img {
@@ -44,8 +41,11 @@ main {
   display: flex;
 }
 main {
-  margin-top: 80px; /* Adjust based on header height */
-  margin-bottom: 60px; /* Adjust based on footer height */
+  /* Alternatively, you can use absolute positioning, but using margins is simpler: */
+  margin-top: 80px;   /* equal to header height */
+  margin-bottom: 60px; /* equal to footer height */
+  display: flex;
+  height: calc(100vh - 80px - 60px); /* full viewport height minus header & footer */
 }
 
 /* Footer: Fixed at the bottom */
@@ -54,7 +54,8 @@ footer {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #fff; /* White background */
+  height: 60px; /* Set your desired footer height */
+  background-color: #fff;
   z-index: 1000;
   border-top: 1px solid #ccc;
   padding: 10px;
@@ -83,32 +84,26 @@ footer {
 
 .panel {
   flex: 1;
-  padding: 40px;
-  overflow-y: auto; /* If content is tall, it can scroll */
-  height: calc(100vh - 80px); /* Adjust for header/footer height */
+  overflow-y: auto; /* Scroll only the content within the panel */
+  padding: 20px;
 }
 
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
-  margin-left: 40px;
-  margin-top: 40px;
-  margin-bottom: 80px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
+  overflow: hidden; /* Prevent the iframe from showing its own scroll */
 }
 
-.right-panel {
-  background: #E5E8F0; /*same as chatbot*/
-}
-
-
-
-/* Iframe style */
-#docIframe {
+.left-panel #docIframe {
   width: 100%;
   height: 100%;
   border: none;
+  /* The iframe content should be allowed to scroll only via the left panel's scrollbar */
+}
+
+.right-panel {
+  background: #E5E8F0; /* Same as your chatbot background */
+  overflow-y: auto; /* It will scroll internally */
 }
 
 /* Comments section */
