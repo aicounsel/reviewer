@@ -88,10 +88,13 @@ footer {
 .left-panel {
   background: #ffffff;
   border-right: 2px solid #ccc;
+  
 }
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
+
+
 
 /* Iframe style */
 #docIframe {
@@ -190,31 +193,22 @@ button:hover {
   width: 50px;
   height: 50px;
   transform: rotate(45deg);
-  border: 3px solid gray; /* default color for "untouched" */
-  background: transparent;
+  border: 8px solid rgb(100, 100, 100); /* default color for "untouched" */
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 4px; /* small gap before the connecting line */
+  border-radius: 8px;
 }
 
-/* White outline behind the diamond's border */
-.diamond-outline {
-  content: "";
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  border: 2px solid #fff; /* white gap */
-  border-radius: 2px;     /* slightly rounded corners if desired */
-}
 
 /* The step number inside the diamond (un-rotate it so it's readable) */
 .diamond span {
   position: relative;
   transform: rotate(-45deg);
   font-size: 16px;
+  font-weight: bold;
   color: gray; /* default text color for "untouched" */
 }
 
@@ -264,3 +258,4 @@ button:hover {
 textarea {
   resize: vertical;
 }
+
