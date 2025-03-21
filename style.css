@@ -95,16 +95,12 @@ footer {
       display: flex; /*claude*/
     flex-direction: column; /*claude*/
     height: 100vh; /*claude*/
-    overflow: hidden; /*claude*/
-
-  
+    overflow: auto; /*ME*/ 
 }
 
 .right-panel {
   background: #E5E8F0; /*same as chatbot*/
 }
-
-
 
 /* Iframe style */
 #docIframe {
@@ -112,15 +108,15 @@ footer {
   width: 100%;
   height: 100%;
   border: none;
-  overflow: auto; /* This is the only scroll bar we want to keep */
+  overflow: hidden; /* ME - was: This is the only scroll bar we want to keep */
 }
 
 /* Comments section */
 
-  #commentContainer {
-    overflow: auto; /* Allow scrolling in the comment section if needed */
-    max-height: 40vh; /* Adjust based on your layout */
-  }
+#commentContainer {
+  overflow: auto; /* Allow scrolling in the comment section if needed */
+  max-height: 100vh; /* Adjust based on your layout */
+}
 
 .comment-item {
   background: #fff;
