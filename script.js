@@ -15,7 +15,7 @@ function getDocumentIdFromUrl() {
   return params.get("documentId");
 }
 
-// Force Roboto into iFrame
+// Inject document style to override fonts in the iframe.
 function injectDocumentStyle(iframeDoc) {
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
@@ -26,16 +26,16 @@ function injectDocumentStyle(iframeDoc) {
   iframeDoc.head.appendChild(styleEl);
 }
 
-// Inject CSS for highlighted text into the iframe.
+// Inject CSS for highlighted text and additional font overrides into the iframe.
 function injectHighlightStyle(iframeDoc) {
-  
-  // Add Roboto font link
+  // Add Roboto font link.
   const fontLink = iframeDoc.createElement("link");
   fontLink.rel = "stylesheet";
-  fontLink.href = "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap";
-  iframeDoc.head.appendChild(fontLink); 
-  
-  // Add font override styles
+  fontLink.href =
+    "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap";
+  iframeDoc.head.appendChild(fontLink);
+
+  // Add override styles and highlight styles.
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
     html, body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, a {
@@ -48,7 +48,7 @@ function injectHighlightStyle(iframeDoc) {
       background-color: #e8eb6d;
       transition: background-color 0.3s ease;
     }
-        /* Add margins to the document body */
+    /* Add margins to the document body */
     body {
       margin: 40px !important;
       padding: 20px !important;
@@ -56,8 +56,7 @@ function injectHighlightStyle(iframeDoc) {
       margin-left: auto !important;
       margin-right: auto !important;
     }
-    
-    /* If the content is inside a specific container, you might need this too */
+    /* Additional container overrides (if needed) */
     .document-content, main, article, .content, #content, .document {
       margin: 20px !important;
       padding: 15px !important;
@@ -93,7 +92,7 @@ function renderProgressBar(comments) {
   progressBarContainer.innerHTML = ""; // Clear any existing content
 
   comments.forEach((comment, index) => {
-    // Create the container for this step and set default state as "untouched".
+    // Create the container for this step with default state "untouched".
     const stepEl = document.createElement("div");
     stepEl.classList.add("step", "untouched");
 
@@ -108,7 +107,7 @@ function renderProgressBar(comments) {
 
     // Create the span with the step number inside the diamond.
     const numSpan = document.createElement("span");
-    numSpan.textContent = index + 1; // or padStart if needed
+    numSpan.textContent = index + 1;
     diamondEl.appendChild(numSpan);
 
     stepEl.appendChild(diamondEl);
@@ -135,21 +134,21 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
+    // Add hover events for highlighting document text.
     commentItem.addEventListener("mouseenter", () => {
-  highlightDocumentText(comment.TextID, true);
-});
-commentItem.addEventListener("mouseleave", () => {
-  highlightDocumentText(comment.TextID, false);
-});
+      highlightDocumentText(comment.TextID, true);
+    });
+    commentItem.addEventListener("mouseleave", () => {
+      highlightDocumentText(comment.TextID, false);
+    });
+
     // Create metadata element (displaying Author and formatted Date).
-// Create metadata element (displaying Author and formatted Date).
-const metadataDiv = document.createElement("div");
-metadataDiv.classList.add("comment-metadata");
-const formattedDate = formatDate(comment.CommentDateTime);
-// Remove any bracketed number (e.g., " [3]") from the author name.
-const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
-metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
-commentItem.appendChild(metadataDiv);
+    const metadataDiv = document.createElement("div");
+    metadataDiv.classList.add("comment-metadata");
+    const formattedDate = formatDate(comment.CommentDateTime);
+    const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
+    metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
+    commentItem.appendChild(metadataDiv);
 
     // Create comment text element.
     const textDiv = document.createElement("div");
@@ -174,7 +173,6 @@ commentItem.appendChild(metadataDiv);
     // --- Event Listeners for interaction ---
     textarea.addEventListener("focus", () => {
       if (comment.stepElement) {
-        // Remove "untouched" and "complete", then add "in-progress".
         comment.stepElement.classList.remove("untouched", "complete");
         comment.stepElement.classList.add("in-progress");
       }
@@ -190,192 +188,4 @@ commentItem.appendChild(metadataDiv);
       highlightDocumentText(comment.TextID, false);
     });
     completeBtn.addEventListener("click", () => {
-      comment.response = textarea.value.trim();
-      comment.isComplete = true;
-      if (comment.stepElement) {
-        // Remove "untouched" and "in-progress", then add "complete".
-        comment.stepElement.classList.remove("untouched", "in-progress");
-        comment.stepElement.classList.add("complete");
-      }
-    });
-    // Append the button to the response area.
-    responseDiv.appendChild(completeBtn);
-
-    commentItem.appendChild(responseDiv);
-    commentContainer.appendChild(commentItem);
-  });
-}
-
-// --- UTILITY FUNCTIONS ---
-
-// Highlight or un-highlight text in the loaded iframe.
-function highlightDocumentText(textID, highlight) {
-  const docIframe = document.getElementById("docIframe");
-  const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
-  if (!iframeDoc) return;
-  const anchor = iframeDoc.querySelector(`a[name="${textID}"]`);
-  if (!anchor) return;
-  if (highlight) {
-    anchor.classList.add("highlighted-text");
-    anchor.scrollIntoView({ behavior: "smooth", block: "center" });
-  } else {
-    anchor.classList.remove("highlighted-text");
-  }
-}
-
-// Handle "Submit All" button click.
-function handleSubmitAll() {
-  const documentId = getDocumentIdFromUrl();
-  const reviewerNameInput = document.getElementById("reviewerNameInput");
-  if (!reviewerNameInput.value.trim()) {
-    alert("Please enter your name.");
-    return;
-  }
-
-  // Validate that all comment responses (excluding the reviewer name box) are filled.
-  const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
-  let allFilled = true;
-  commentItems.forEach((item) => {
-    const textarea = item.querySelector("textarea");
-    if (textarea && !textarea.value.trim()) {
-      allFilled = false;
-    }
-  });
-  if (!allFilled) {
-    alert("Please fill out all comment responses.");
-    return;
-  }
-
-  // Re-fetch comments to build the submission payload.
-  fetch(COMMENTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ DocumentID: documentId })
-  })
-    .then((res) => res.json())
-    .then((allData) => {
-      const commentsForDoc = allData.Comments.filter(c => c.DocumentID === documentId);
-
-      // Collect responses from DOM.
-      const commentItems = document.querySelectorAll(".comment-item:not(.reviewer-name-item)");
-      commentItems.forEach((item, idx) => {
-        const textarea = item.querySelector("textarea");
-        commentsForDoc[idx].response = textarea.value.trim();
-      });
-
-      const totalComments = commentsForDoc.length;
-      let responseIndex = 0;
-
-      const payloadComments = commentsForDoc.map(c => {
-        if (c.response && c.response !== "") {
-          responseIndex++;
-          return {
-            CommentID: c.CommentID,
-            ResponseID: `_cmnt${totalComments + responseIndex}`,
-            ResponseText: c.response,
-            ResponseAuthor: reviewerNameInput.value.trim(),
-            ResponseDateTime: new Date().toISOString(),
-            ResponseTextID: `_cmntref${totalComments + responseIndex}`,
-            ResponseTextHighlight: c.TextHighlight,
-            ResponseFullText: c.FullText
-          };
-        } else {
-          return {
-            CommentID: c.CommentID,
-            ResponseID: "",
-            ResponseText: "",
-            ResponseAuthor: "",
-            ResponseDateTime: "",
-            ResponseTextID: "",
-            ResponseTextHighlight: "",
-            ResponseFullText: ""
-          };
-        }
-      });
-
-      const payload = {
-        DocumentID: documentId,
-        Comments: payloadComments
-      };
-
-      console.log("Submitting data to Power Automate:", payload);
-
-      fetch("https://prod-187.westus.logic.azure.com:443/workflows/662f3d3b44054a3f930913f1007b9832/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a7Ev7_hYa2Dy75PO4Kij93tlmJLtFPFh1WhkoV-HuMc", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-        .then(() => {
-          alert("Responses submitted successfully!");
-        })
-        .catch((err) => {
-          console.error("Error submitting responses:", err);
-          alert("An error occurred while submitting responses.");
-        });
-    })
-    .catch((err) => {
-      console.error("Error in handleSubmitAll fetch:", err);
-    });
-}
-
-// --- MAIN EXECUTION: Run After DOM Loads ---
-document.addEventListener("DOMContentLoaded", () => {
-  const documentId = getDocumentIdFromUrl();
-  if (!documentId) {
-    alert("No DocumentID provided in URL. Example: ?documentId=mydoc-1234");
-    return;
-  }
-
-  // 1. Set the iframe source to the matching HTML in /agreements.
-  const docIframe = document.getElementById("docIframe");
-  docIframe.src = `./agreements/${documentId}.html`;
-  docIframe.addEventListener("load", () => {
-    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
-if (iframeDoc) {
-  // Inject the document font override.
-  injectDocumentStyle(iframeDoc);
-  
-  // Then inject your highlight styles (or any additional styles).
-  injectHighlightStyle(iframeDoc);
-}
-  });
-
-  // 2. Insert Reviewer Name box above the comment container.
-  const reviewerNameDiv = document.createElement("div");
-  reviewerNameDiv.classList.add("comment-item", "reviewer-name-item");
-  const nameResponseDiv = document.createElement("div");
-  nameResponseDiv.classList.add("response-area");
-  const nameLabel = document.createElement("div");
-  nameLabel.textContent = "Your Name";
-  const nameInput = document.createElement("input");
-  nameInput.placeholder = "Enter Your Name...";
-  nameInput.id = "reviewerNameInput";
-  nameInput.required = true;
-  nameInput.style.width = "100%";
-  nameInput.style.marginBottom = "10px";
-  nameResponseDiv.appendChild(nameLabel);
-  nameResponseDiv.appendChild(nameInput);
-  reviewerNameDiv.appendChild(nameResponseDiv);
-  const commentContainer = document.getElementById("commentContainer");
-  commentContainer.insertAdjacentElement("afterbegin", reviewerNameDiv);
-
-  // 3. Fetch comments from Power Automate.
-  fetch(COMMENTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ DocumentID: documentId })
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Fetched data:", data);
-      const commentsForDoc = data.Comments || [];
-      renderProgressBar(commentsForDoc);
-      renderComments(commentsForDoc);
-    })
-    .catch((err) => {
-      console.error("Error fetching comments:", err);
-    });
-
-  // 4. Set up the "Submit All" button.
-  document.getElementById("submitAllBtn").addEventListener("click", handleSubmitAll);
-});
+      comment.res
