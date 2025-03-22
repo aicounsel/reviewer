@@ -194,7 +194,7 @@ function renderComments(comments) {
     });
 
     const completeBtn = document.createElement("button");
-    completeBtn.textContent = "Mark as Complete";
+    completeBtn.textContent = "✔";
 
     textarea.addEventListener("focus", () => {
       if (comment.state !== "complete" && comment.stepElement) {
