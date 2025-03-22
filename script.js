@@ -358,6 +358,19 @@ function handleSubmitAll() {
     });
 }
 
+// Custom Alert at Submit
+function showCustomAlert() {
+  const overlay = document.getElementById("custom-alert-overlay");
+  overlay.style.display = "flex";
+  const button = document.getElementById("custom-alert-button");
+  button.onclick = function() {
+    // Attempt to close the current tab.
+    window.close();
+  };
+}
+// Example: Call the custom alert when needed.
+// showCustomAlert();
+
 // --- MAIN EXECUTION: Run After DOM Loads ---
 document.addEventListener("DOMContentLoaded", () => {
   const documentId = getDocumentIdFromUrl();
