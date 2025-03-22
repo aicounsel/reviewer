@@ -153,11 +153,13 @@ function renderComments(comments) {
 
     commentItem.appendChild(headerDiv);
 
+    // Comment text element.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
+    // Interaction area for responses.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
@@ -174,11 +176,14 @@ function renderComments(comments) {
       highlightDocumentText(comment.TextID, false);
     });
 
+    // "Mark as Complete" button.
     const completeBtn = document.createElement("button");
-    completeBtn.textContent = "✔";
+    // Initial text for button in non-complete state.
+    completeBtn.textContent = "Mark as Complete";
 
     // Event listener for focus.
     textarea.addEventListener("focus", () => {
+      // Only change state if not already complete.
       if (comment.state !== "complete" && comment.stepElement) {
         comment.state = "in-progress";
         comment.stepElement.classList.remove("untouched", "complete", "in-progress");
@@ -189,6 +194,7 @@ function renderComments(comments) {
 
     // Event listener for blur.
     textarea.addEventListener("blur", () => {
+      // Only update state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         if (!textarea.value.trim()) {
           comment.state = "untouched";
@@ -202,8 +208,15 @@ function renderComments(comments) {
     // Event listener for "Mark as Complete" button.
     completeBtn.addEventListener("click", () => {
       if (comment.state === "complete") {
-        // Already complete: do nothing (or toggle if desired)
+        // Toggle back to in-progress so user can edit.
+        comment.state = "in-progress";
+        if (comment.stepElement) {
+          comment.stepElement.classList.remove("complete", "untouched", "in-progress");
+          comment.stepElement.classList.add("in-progress");
+        }
+        completeBtn.textContent = "Mark as Complete";
       } else {
+        // Mark as complete.
         comment.response = textarea.value.trim();
         comment.state = "complete";
         if (comment.stepElement) {
@@ -213,6 +226,7 @@ function renderComments(comments) {
         completeBtn.textContent = "✔";
       }
     });
+
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
