@@ -127,9 +127,12 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Add click event on entire comment item to highlight document text.
-    commentItem.addEventListener("click", () => {
+    // Add hover events on the entire comment box.
+    commentItem.addEventListener("mouseenter", () => {
       highlightDocumentText(comment.TextID, true);
+    });
+    commentItem.addEventListener("mouseleave", () => {
+      highlightDocumentText(comment.TextID, false);
     });
 
     // Create header container for fancy number and metadata.
@@ -163,12 +166,19 @@ function renderComments(comments) {
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
+    // Also add hover events to the textarea.
+    textarea.addEventListener("mouseenter", () => {
+      highlightDocumentText(comment.TextID, true);
+    });
+    textarea.addEventListener("mouseleave", () => {
+      highlightDocumentText(comment.TextID, false);
+    });
+
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "✔";
 
     // Event listener for focus.
     textarea.addEventListener("focus", () => {
-      // Only change state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         comment.state = "in-progress";
         comment.stepElement.classList.remove("untouched", "complete", "in-progress");
@@ -179,7 +189,6 @@ function renderComments(comments) {
 
     // Event listener for blur.
     textarea.addEventListener("blur", () => {
-      // Only update state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         if (!textarea.value.trim()) {
           comment.state = "untouched";
@@ -193,17 +202,14 @@ function renderComments(comments) {
     // Event listener for "Mark as Complete" button.
     completeBtn.addEventListener("click", () => {
       if (comment.state === "complete") {
-        // Leave it complete until toggled explicitly.
-        // (Alternatively, you could toggle back to in-progress if you want to allow editing.)
+        // Already complete: do nothing (or toggle if desired)
       } else {
-        // Mark as complete.
         comment.response = textarea.value.trim();
         comment.state = "complete";
         if (comment.stepElement) {
           comment.stepElement.classList.remove("untouched", "in-progress", "complete");
           comment.stepElement.classList.add("complete");
         }
-        // Change the button text to a checkmark.
         completeBtn.textContent = "✔";
       }
     });
@@ -213,6 +219,7 @@ function renderComments(comments) {
     commentContainer.appendChild(commentItem);
   });
 }
+
 
 // --- UTILITY FUNCTIONS ---
 
