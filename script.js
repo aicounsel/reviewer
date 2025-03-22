@@ -205,6 +205,7 @@ function renderComments(comments) {
       comment.stepElement.classList.remove("untouched", "in-progress");
       comment.stepElement.classList.add("complete");
     }
+    completeBtn.textContent = "✔";
   }
 });
     responseDiv.appendChild(completeBtn);
