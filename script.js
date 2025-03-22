@@ -35,7 +35,7 @@ function injectHighlightStyle(iframeDoc) {
     "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap";
   iframeDoc.head.appendChild(fontLink);
 
-  // Add override and highlight styles.
+  // Add override styles and highlight styles.
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
     html, body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, a {
@@ -83,10 +83,11 @@ function formatDate(dateString) {
 // Render the diamond-based progress bar in #progressBarContainer.
 function renderProgressBar(comments) {
   const progressBarContainer = document.getElementById("progressBarContainer");
-  progressBarContainer.innerHTML = ""; // Clear any existing content
+  progressBarContainer.innerHTML = ""; // Clear existing content
 
   comments.forEach((comment, index) => {
     const stepEl = document.createElement("div");
+    // Start in "untouched" state.
     stepEl.classList.add("step", "untouched");
 
     const diamondEl = document.createElement("div");
@@ -109,6 +110,7 @@ function renderProgressBar(comments) {
     }
 
     progressBarContainer.appendChild(stepEl);
+    // Save reference for later updates.
     comment.stepElement = stepEl;
   });
 }
@@ -119,10 +121,13 @@ function renderComments(comments) {
   console.log("Rendering comments:", comments);
 
   comments.forEach((comment, index) => {
+    // Initialize state property.
+    comment.state = "untouched";
+    
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Header container for the fancy number and metadata.
+    // Create header container for fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
@@ -156,41 +161,46 @@ function renderComments(comments) {
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
-    // Modified event listeners:
+    // Event listener for focus.
     textarea.addEventListener("focus", () => {
-      if (!comment.isComplete && comment.stepElement) {
-        comment.stepElement.classList.remove("untouched", "complete");
+      // Only change state if not complete.
+      if (comment.state !== "complete" && comment.stepElement) {
+        comment.state = "in-progress";
+        comment.stepElement.classList.remove("untouched", "complete", "in-progress");
         comment.stepElement.classList.add("in-progress");
       }
       highlightDocumentText(comment.TextID, true);
     });
 
+    // Event listener for blur.
     textarea.addEventListener("blur", () => {
       // Only change state if not complete.
-      if (!comment.isComplete) {
-        if (!textarea.value.trim() && comment.stepElement) {
-          comment.stepElement.classList.remove("in-progress");
+      if (comment.state !== "complete" && comment.stepElement) {
+        if (!textarea.value.trim()) {
+          comment.state = "untouched";
+          comment.stepElement.classList.remove("in-progress", "complete", "untouched");
           comment.stepElement.classList.add("untouched");
         }
       }
       highlightDocumentText(comment.TextID, false);
     });
 
+    // Event listener for "Mark as Complete" button.
     completeBtn.addEventListener("click", () => {
       // Toggle complete state.
-      if (comment.isComplete) {
-        // If already complete, toggle back to in-progress.
-        comment.isComplete = false;
+      if (comment.state === "complete") {
+        // Toggle back to in-progress so user can edit.
+        comment.state = "in-progress";
         if (comment.stepElement) {
-          comment.stepElement.classList.remove("complete");
+          comment.stepElement.classList.remove("complete", "untouched", "in-progress");
           comment.stepElement.classList.add("in-progress");
         }
       } else {
         // Mark as complete.
         comment.response = textarea.value.trim();
-        comment.isComplete = true;
+        comment.state = "complete";
         if (comment.stepElement) {
-          comment.stepElement.classList.remove("untouched", "in-progress");
+          comment.stepElement.classList.remove("untouched", "in-progress", "complete");
           comment.stepElement.classList.add("complete");
         }
       }
