@@ -89,21 +89,30 @@ footer {
 }
 
 .left-panel {
-  background: #ffffff;
-  border-right: 2px solid #ccc;
-  overflow: hidden; /* Prevent the iframe from showing its own scroll */
+    background:; /*XXXXXXXXX*/
+    /* border-right: 2px solid #ccc; XXXXXXXXX*/
+    overflow: hidden;
+    /* Prevent the iframe from showing its own scroll */
+    margin-bottom: 0px; /*XXXXXXXXX*/
 }
 
 .left-panel #docIframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  /* The iframe content should be allowed to scroll only via the left panel's scrollbar */
+    width: 100%;
+    height: 100%;
+    border: none;
+    background:#fff; /*XXXXXXXXX*/
+    /* The iframe content should be allowed to scroll only via the left panel's scrollbar */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /*XXXXXXXXX*/
+    border-radius: 10px; /*XXXXXXXXX*/
+    margin-left: 20px; /*XXXXXXXXX*/
+    margin-top: 30px; /*XXXXXXXXX*/
+    margin-bottom: 0px; /*XXXXXXXXX*/
 }
 
 .right-panel {
   background: #E5E8F0; /* Same as your chatbot background */
   overflow-y: auto; /* It will scroll internally */
+  padding: 40px; /*XXXXXX*/
 }
 
 /* Comments section */
