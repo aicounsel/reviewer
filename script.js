@@ -1,4 +1,3 @@
-
 /*************************************************
  * script.js 
  * Reviewer Portal
@@ -84,7 +83,7 @@ function formatDate(dateString) {
 // Render the diamond-based progress bar in #progressBarContainer.
 function renderProgressBar(comments) {
   const progressBarContainer = document.getElementById("progressBarContainer");
-  progressBarContainer.innerHTML = ""; // Clear existing content
+  progressBarContainer.innerHTML = ""; // Clear any existing content
 
   comments.forEach((comment, index) => {
     const stepEl = document.createElement("div");
@@ -104,6 +103,7 @@ function renderProgressBar(comments) {
 
     stepEl.appendChild(diamondEl);
 
+    // If this is not the last step, add a connecting line.
     if (index < comments.length - 1) {
       const lineEl = document.createElement("div");
       lineEl.classList.add("line");
@@ -111,32 +111,28 @@ function renderProgressBar(comments) {
     }
 
     progressBarContainer.appendChild(stepEl);
-    // Save reference for later updates.
     comment.stepElement = stepEl;
   });
 }
 
-// Render comments and their interaction boxes in #commentContainer.
 // Render comments and their interaction boxes in #commentContainer.
 function renderComments(comments) {
   const commentContainer = document.getElementById("commentContainer");
   console.log("Rendering comments:", comments);
 
   comments.forEach((comment, index) => {
+    // Initialize state.
     comment.state = "untouched";
-    comment.minimized = false;
-
+    
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Add hover events on the entire comment item.
-    commentItem.addEventListener("mouseenter", () => {
+    // Add click event on entire comment item to highlight document text.
+    commentItem.addEventListener("click", () => {
       highlightDocumentText(comment.TextID, true);
     });
-    commentItem.addEventListener("mouseleave", () => {
-      highlightDocumentText(comment.TextID, false);
-    });
 
+    // Create header container for fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
@@ -151,24 +147,6 @@ function renderComments(comments) {
     const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
     metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
     headerDiv.appendChild(metadataDiv);
-
-    // Minimize toggle button (if using that feature)
-    const toggleBtn = document.createElement("button");
-    toggleBtn.classList.add("minimize-toggle");
-    toggleBtn.textContent = "→";
-    toggleBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (comment.minimized) {
-        comment.minimized = false;
-        commentItem.classList.remove("minimized");
-        toggleBtn.textContent = "→";
-      } else {
-        comment.minimized = true;
-        commentItem.classList.add("minimized");
-        toggleBtn.textContent = "←";
-      }
-    });
-    headerDiv.appendChild(toggleBtn);
 
     commentItem.appendChild(headerDiv);
 
@@ -185,18 +163,12 @@ function renderComments(comments) {
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
-    // Also add hover events on the textarea (optional if already covered by commentItem)
-    textarea.addEventListener("mouseenter", () => {
-      highlightDocumentText(comment.TextID, true);
-    });
-    textarea.addEventListener("mouseleave", () => {
-      highlightDocumentText(comment.TextID, false);
-    });
-
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "✔";
 
+    // Event listener for focus.
     textarea.addEventListener("focus", () => {
+      // Only change state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         comment.state = "in-progress";
         comment.stepElement.classList.remove("untouched", "complete", "in-progress");
@@ -205,7 +177,9 @@ function renderComments(comments) {
       highlightDocumentText(comment.TextID, true);
     });
 
+    // Event listener for blur.
     textarea.addEventListener("blur", () => {
+      // Only update state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         if (!textarea.value.trim()) {
           comment.state = "untouched";
@@ -216,17 +190,20 @@ function renderComments(comments) {
       highlightDocumentText(comment.TextID, false);
     });
 
+    // Event listener for "Mark as Complete" button.
     completeBtn.addEventListener("click", () => {
       if (comment.state === "complete") {
-        // If already complete, leave it complete.
+        // Leave it complete until toggled explicitly.
+        // (Alternatively, you could toggle back to in-progress if you want to allow editing.)
       } else {
+        // Mark as complete.
         comment.response = textarea.value.trim();
         comment.state = "complete";
         if (comment.stepElement) {
           comment.stepElement.classList.remove("untouched", "in-progress", "complete");
           comment.stepElement.classList.add("complete");
         }
-        // Optionally, change the complete button's text to a checkmark.
+        // Change the button text to a checkmark.
         completeBtn.textContent = "✔";
       }
     });
@@ -236,7 +213,6 @@ function renderComments(comments) {
     commentContainer.appendChild(commentItem);
   });
 }
-
 
 // --- UTILITY FUNCTIONS ---
 
@@ -391,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <li>Hover over each comment to highlight the relevant text.</li>
       <li>✔ or uncheck a comment to mark your progress.</li>
       <li>Your answers are securely submitted once you Submit All Answers.</li>
-      <li>AI has collected <span class="comment-count">[X]</span> comments that need your attention.</li>
+      <li>AI has pulled <span class="comment-count">[X]</span> comments that need your attention.</li>
     </ul>
     <p>Let's begin.</p>
   `;
@@ -404,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
   const nameLabel = document.createElement("div");
-  nameLabel.textContent = "➡️ Let's start with your name:";
+  nameLabel.textContent = "Let's start with your name:";
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
