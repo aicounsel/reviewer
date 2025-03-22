@@ -257,8 +257,21 @@ function highlightDocumentText(textID, highlight) {
 
 // Lock Portal after Submit
 function lockPortal() {
-  // Select all interactive elements in the portal.
-  // You can adjust the selector if you only want to target a specific container.
+  // Create the overlay element.
+  const overlay = document.createElement("div");
+  overlay.id = "portal-overlay";
+
+  // Optionally, you can add some text or a spinner to indicate that submission is in progress.
+  // For example:
+  // const message = document.createElement("div");
+  // message.textContent = "Submitting...";
+  // message.style.color = "#fff";
+  // message.style.fontSize = "2em";
+  // overlay.appendChild(message);
+  
+  // Append the overlay to the body.
+  document.body.appendChild(overlay);
+  
   const interactiveElements = document.querySelectorAll("input, textarea, button");
   interactiveElements.forEach((el) => {
     el.disabled = true;
