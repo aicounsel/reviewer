@@ -186,25 +186,26 @@ function renderComments(comments) {
     });
 
     // Event listener for "Mark as Complete" button.
-    completeBtn.addEventListener("click", () => {
-      // Toggle complete state.
-      if (comment.state === "complete") {
-        // Toggle back to in-progress so user can edit.
-        comment.state = "in-progress";
-        if (comment.stepElement) {
-          comment.stepElement.classList.remove("complete", "untouched", "in-progress");
-          comment.stepElement.classList.add("in-progress");
-        }
-      } else {
-        // Mark as complete.
-        comment.response = textarea.value.trim();
-        comment.state = "complete";
-        if (comment.stepElement) {
-          comment.stepElement.classList.remove("untouched", "in-progress", "complete");
-          comment.stepElement.classList.add("complete");
-        }
-      }
-    });
+   completeBtn.addEventListener("click", () => {
+  if (comment.state === "complete") {
+    // Toggle back to in-progress so the user can edit.
+    comment.state = "in-progress";
+    completeBtn.classList.remove("btn-complete");
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("complete");
+      comment.stepElement.classList.add("in-progress");
+    }
+  } else {
+    // Mark as complete.
+    comment.response = textarea.value.trim();
+    comment.state = "complete";
+    completeBtn.classList.add("btn-complete");
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("untouched", "in-progress");
+      comment.stepElement.classList.add("complete");
+    }
+  }
+});
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
