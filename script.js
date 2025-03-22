@@ -368,15 +368,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const introContent = document.createElement("div");
   introContent.classList.add("intro-content");
   introContent.innerHTML = `
-    <p>Welcome to AI Counsel! 👋</p>
-    <p>I'm your Client Assistant and your attorney has some questions for you on your contract. A few quick notes:</p>
+    <p><b>Welcome to AI Counsel's Client Assistant!</b> 👋</p>
+    <p>A few quick notes to help you navigate:</p>
     <ul>
-      <li>Hover over each comment to highlight the relevant text.</li>
-      <li>✔ or uncheck a comment to mark your progress.</li>
-      <li>Your answers are securely submitted once you Submit All Answers.</li>
-      <li>AI has pulled <span class="comment-count">[X]</span> comments that need your attention.</li>
+      <li>Hover over comments to highlight the relevant text.</li>
+      <li>Check or uncheck comments to track your progress.</li>
+      <li>Click "Submit All Answers" when you've completed your review.</li>
+      <li>We've identified <span class="comment-count">[X]</span> comments requiring your attention.</li>
     </ul>
-    <p>Let's begin.</p>
+    <p>Ready to begin? Let's get started.</p>
   `;
   introDiv.appendChild(introContent);
   commentContainer.insertAdjacentElement("afterbegin", introDiv);
