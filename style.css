@@ -164,27 +164,6 @@ footer {
   font-size: 1em;
 }
 
-/* Style for the minimize toggle button in the comment header */
-.minimize-toggle {
-  margin-left: auto; /* push to the right */
-  background: transparent;
-  border: none;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-/* When a comment is minimized, hide text and response area */
-.comment-item.minimized .comment-text,
-.comment-item.minimized .response-area {
-  display: none;
-}
-
-/* Optionally, adjust the header when minimized (if needed) */
-.comment-item.minimized .comment-header {
-  /* For example, center the number and show the left arrow clearly */
-  justify-content: space-between;
-}
-
 /***Hover States***/
 
 .comment-item:hover,
