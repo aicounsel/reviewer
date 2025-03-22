@@ -1,6 +1,5 @@
+/*** STYLES ****/
 
-
-/* Resets and basic styling */
 * {
   box-sizing: border-box;
 }
@@ -58,8 +57,10 @@ footer {
   background-color: #fff;
   z-index: 1000;
   border-top: 1px solid #ccc;
-  padding: 10px;
-  text-align: right;
+  display: flex;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  padding-bottom: 20px;      /* Adds extra space underneath the button */
 }
 
 /* Container that holds all steps */
@@ -261,7 +262,8 @@ button:active {
 }
 
 #submitAllBtn {
-  margin-bottom: 20px;
+  display: inline-block; /* may conflict with footer */
+  margin-top: 20px;  /* may conflict with footer */
 }
 
 /* --- STATES (use these classes in your JS) --- */
