@@ -157,7 +157,8 @@ function renderComments(comments) {
     completeBtn.textContent = "Mark as Complete";
 
     textarea.addEventListener("focus", () => {
-      if (comment.stepElement) {
+      // Only change state if not complete.
+      if (!comment.isComplete && comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
         comment.stepElement.classList.add("in-progress");
       }
@@ -173,24 +174,24 @@ function renderComments(comments) {
       highlightDocumentText(comment.TextID, false);
     });
     completeBtn.addEventListener("click", () => {
-  // If the comment is already complete, toggle back to in-progress
-  if (comment.isComplete) {
-    comment.isComplete = false;
-    // Switch the state from complete to in-progress
-    if (comment.stepElement) {
-      comment.stepElement.classList.remove("complete");
-      comment.stepElement.classList.add("in-progress");
-    }
-  } else {
-    // Mark the comment as complete
-    comment.response = textarea.value.trim();
-    comment.isComplete = true;
-    if (comment.stepElement) {
-      comment.stepElement.classList.remove("untouched", "in-progress");
-      comment.stepElement.classList.add("complete");
-    }
-  }
-});
+      // Toggle complete state on button click.
+      if (comment.isComplete) {
+        // If already complete, toggle back to in-progress.
+        comment.isComplete = false;
+        if (comment.stepElement) {
+          comment.stepElement.classList.remove("complete");
+          comment.stepElement.classList.add("in-progress");
+        }
+      } else {
+        // Mark as complete.
+        comment.response = textarea.value.trim();
+        comment.isComplete = true;
+        if (comment.stepElement) {
+          comment.stepElement.classList.remove("untouched", "in-progress");
+          comment.stepElement.classList.add("complete");
+        }
+      }
+    });
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
@@ -252,7 +253,7 @@ function handleSubmitAll() {
         (c) => c.DocumentID === documentId
       );
 
-      // Exclude intro/reviewer-name bubbles.
+      // Exclude intro and reviewer-name bubbles.
       const commentItems = document.querySelectorAll(
         ".comment-item:not(.reviewer-name-item):not(.client-intro-bubble)"
       );
@@ -330,7 +331,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const docIframe = document.getElementById("docIframe");
   docIframe.src = `./agreements/${documentId}.html`;
   docIframe.addEventListener("load", () => {
-    const iframeDoc = docIframe.contentDocument || docIframe.contentWindow.document;
+    const iframeDoc =
+      docIframe.contentDocument || docIframe.contentWindow.document;
     if (iframeDoc) {
       injectDocumentStyle(iframeDoc);
       injectHighlightStyle(iframeDoc);
