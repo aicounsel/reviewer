@@ -179,7 +179,7 @@ function renderComments(comments) {
     // "Mark as Complete" button.
     const completeBtn = document.createElement("button");
     // Initial text for button in non-complete state.
-    completeBtn.textContent = "Mark as Complete";
+    completeBtn.textContent = "✔";
 
     // Event listener for focus.
     textarea.addEventListener("focus", () => {
@@ -214,7 +214,7 @@ function renderComments(comments) {
           comment.stepElement.classList.remove("complete", "untouched", "in-progress");
           comment.stepElement.classList.add("in-progress");
         }
-        completeBtn.textContent = "Mark as Complete";
+        completeBtn.textContent = "✔";
       } else {
         // Mark as complete.
         comment.response = textarea.value.trim();
