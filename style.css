@@ -228,28 +228,29 @@ button {
       border-radius: 30px;
       cursor: pointer;
     }
-    
-    button:hover:not(:focus) {
-      opacity: 0.5;
-      background: #706DEB;
-      color: #fff;
-      border: 2px;
-      border: 2px solid #706DEB;
-      padding: 10px 15px;
-      margin-top: 10px;
-      border-radius: 30px;
-      cursor: pointer;
-    }
 
-    button:focus {
-      background: #706DEB;
-      color: #fff;
-      padding: 10px 15px;
-      border: 2px solid #706DEB;
-      margin-top: 10px;
-      border-radius: 30px;
-      cursor: pointer;
-    }
+/* Hover state for buttons that are not in complete state */
+button:hover:not(.btn-complete) {
+  opacity: 0.5;
+  background: #706DEB;
+  color: #fff;
+  /* Border remains the same */
+}
+
+/* Active state for all buttons */
+button:active {
+  background: #706DEB;
+  color: #fff;
+}
+
+/* When the button is marked complete */
+.btn-complete {
+  background: #706DEB !important;
+  color: #fff !important;
+  border: 2px solid #706DEB !important;
+  opacity: 1 !important; /* Ensure full opacity */
+}
+
 #submitAllBtn {
   margin-bottom: 20px;
 }
