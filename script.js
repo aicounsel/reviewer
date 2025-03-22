@@ -366,11 +366,11 @@ document.addEventListener("DOMContentLoaded", () => {
     <p>I'm your Client Assistant and your attorney has some questions for you on your contract. A few quick notes:</p>
     <ul>
       <li>Hover over each comment to highlight the relevant text.</li>
-      <li>Mark as Complete or minimize a comment for your own convenience.</li>
+      <li>✔ or uncheck a comment to mark your progress.</li>
       <li>Your answers are securely submitted once you Submit All Answers.</li>
-      <li>AI has pulled <span class="comment-count">[X]</span> items that need your attention.</li>
+      <li>AI has collected <span class="comment-count">[X]</span> comments that need your attention.</li>
     </ul>
-    <p>Ready to get started?</p>
+    <p>Let's begin.</p>
   `;
   introDiv.appendChild(introContent);
   commentContainer.insertAdjacentElement("afterbegin", introDiv);
