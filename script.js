@@ -148,7 +148,7 @@ function renderComments(comments) {
     metadataDiv.classList.add("comment-metadata");
     const formattedDate = formatDate(comment.CommentDateTime);
     const author = comment.CommentAuthor.replace(/\s*\[\d+\]\s*/, '');
-    metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
+    metadataDiv.textContent = `Attorney: ${author} | Date: ${formattedDate}`;
     headerDiv.appendChild(metadataDiv);
 
     commentItem.appendChild(headerDiv);
