@@ -35,7 +35,7 @@ function injectHighlightStyle(iframeDoc) {
     "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap";
   iframeDoc.head.appendChild(fontLink);
 
-  // Add override styles and highlight styles.
+  // Add override and highlight styles.
   const styleEl = iframeDoc.createElement("style");
   styleEl.textContent = `
     html, body, p, div, span, h1, h2, h3, h4, h5, h6, li, td, th, a {
@@ -122,7 +122,7 @@ function renderComments(comments) {
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Create header container for the fancy number and metadata.
+    // Header container for the fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
@@ -156,25 +156,28 @@ function renderComments(comments) {
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "Mark as Complete";
 
+    // Modified event listeners:
     textarea.addEventListener("focus", () => {
-      // Only change state if not complete.
       if (!comment.isComplete && comment.stepElement) {
         comment.stepElement.classList.remove("untouched", "complete");
         comment.stepElement.classList.add("in-progress");
       }
       highlightDocumentText(comment.TextID, true);
     });
+
     textarea.addEventListener("blur", () => {
-      if (!textarea.value.trim()) {
-        if (comment.stepElement && !comment.isComplete) {
-          comment.stepElement.classList.remove("in-progress", "complete");
+      // Only change state if not complete.
+      if (!comment.isComplete) {
+        if (!textarea.value.trim() && comment.stepElement) {
+          comment.stepElement.classList.remove("in-progress");
           comment.stepElement.classList.add("untouched");
         }
       }
       highlightDocumentText(comment.TextID, false);
     });
+
     completeBtn.addEventListener("click", () => {
-      // Toggle complete state on button click.
+      // Toggle complete state.
       if (comment.isComplete) {
         // If already complete, toggle back to in-progress.
         comment.isComplete = false;
