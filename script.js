@@ -180,6 +180,7 @@ function renderComments(comments) {
     const completeBtn = document.createElement("button");
     // Initial text for button in non-complete state.
     completeBtn.textContent = "✔";
+    completeBtn.classList.add("complete-button"); // Add a base class for initial styling
 
     // Event listener for focus.
     textarea.addEventListener("focus", () => {
@@ -206,26 +207,28 @@ function renderComments(comments) {
     });
 
     // Event listener for "Mark as Complete" button.
-    completeBtn.addEventListener("click", () => {
-      if (comment.state === "complete") {
-        // Toggle back to in-progress so user can edit.
-        comment.state = "in-progress";
-        if (comment.stepElement) {
-          comment.stepElement.classList.remove("complete", "untouched", "in-progress");
-          comment.stepElement.classList.add("in-progress");
-        }
-        completeBtn.textContent = "✔";
-      } else {
-        // Mark as complete.
-        comment.response = textarea.value.trim();
-        comment.state = "complete";
-        if (comment.stepElement) {
-          comment.stepElement.classList.remove("untouched", "in-progress", "complete");
-          comment.stepElement.classList.add("complete");
-        }
-        completeBtn.textContent = "✔";
-      }
-    });
+completeBtn.addEventListener("click", () => {
+  if (comment.state === "complete") {
+    // Toggle back to in-progress so user can edit.
+    comment.state = "in-progress";
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("complete", "untouched", "in-progress");
+      comment.stepElement.classList.add("in-progress");
+    }
+    completeBtn.textContent = "✔";
+    completeBtn.classList.remove("btn-complete"); // Remove the complete styling
+  } else {
+    // Mark as complete.
+    comment.response = textarea.value.trim();
+    comment.state = "complete";
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("untouched", "in-progress", "complete");
+      comment.stepElement.classList.add("complete");
+    }
+    completeBtn.textContent = "✔";
+    completeBtn.classList.add("btn-complete"); // Add the complete styling
+  }
+});
 
     responseDiv.appendChild(completeBtn);
 
