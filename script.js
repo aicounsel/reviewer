@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
   const nameLabel = document.createElement("div");
-  nameLabel.textContent = "Let's start with your name:";
+  nameLabel.textContent = "➡️ Let's start with your name:";
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
