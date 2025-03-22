@@ -1,3 +1,4 @@
+
 /*************************************************
  * script.js 
  * Reviewer Portal
@@ -83,7 +84,7 @@ function formatDate(dateString) {
 // Render the diamond-based progress bar in #progressBarContainer.
 function renderProgressBar(comments) {
   const progressBarContainer = document.getElementById("progressBarContainer");
-  progressBarContainer.innerHTML = ""; // Clear any existing content
+  progressBarContainer.innerHTML = ""; // Clear existing content
 
   comments.forEach((comment, index) => {
     const stepEl = document.createElement("div");
@@ -103,7 +104,6 @@ function renderProgressBar(comments) {
 
     stepEl.appendChild(diamondEl);
 
-    // If this is not the last step, add a connecting line.
     if (index < comments.length - 1) {
       const lineEl = document.createElement("div");
       lineEl.classList.add("line");
@@ -111,6 +111,7 @@ function renderProgressBar(comments) {
     }
 
     progressBarContainer.appendChild(stepEl);
+    // Save reference for later updates.
     comment.stepElement = stepEl;
   });
 }
@@ -121,29 +122,21 @@ function renderComments(comments) {
   console.log("Rendering comments:", comments);
 
   comments.forEach((comment, index) => {
-    // Initialize properties.
+    // Initialize state property.
     comment.state = "untouched";
-    comment.minimized = false;
-
+    
     const commentItem = document.createElement("div");
     commentItem.classList.add("comment-item");
 
-    // Add a click event on the entire comment item to trigger highlighting.
-    commentItem.addEventListener("click", () => {
-      highlightDocumentText(comment.TextID, true);
-    });
-
-    // Create header container for fancy number, metadata, and minimize toggle.
+    // Create header container for fancy number and metadata.
     const headerDiv = document.createElement("div");
     headerDiv.classList.add("comment-header");
 
-    // Fancy number (➊, ➋, etc.)
     const numberSpan = document.createElement("span");
     numberSpan.classList.add("comment-number");
     numberSpan.textContent = String.fromCodePoint(0x278A + index);
     headerDiv.appendChild(numberSpan);
 
-    // Metadata: Author and Date.
     const metadataDiv = document.createElement("div");
     metadataDiv.classList.add("comment-metadata");
     const formattedDate = formatDate(comment.CommentDateTime);
@@ -151,37 +144,13 @@ function renderComments(comments) {
     metadataDiv.textContent = `Author: ${author} | Date: ${formattedDate}`;
     headerDiv.appendChild(metadataDiv);
 
-    // Minimize toggle button.
-    const toggleBtn = document.createElement("button");
-    toggleBtn.classList.add("minimize-toggle");
-    // Initially, comment is expanded so show right arrow.
-    toggleBtn.textContent = "→";
-    toggleBtn.addEventListener("click", (e) => {
-      // Prevent the click from triggering the commentItem's click.
-      e.stopPropagation();
-      if (comment.minimized) {
-        // Expand comment.
-        comment.minimized = false;
-        commentItem.classList.remove("minimized");
-        toggleBtn.textContent = "→";
-      } else {
-        // Minimize comment.
-        comment.minimized = true;
-        commentItem.classList.add("minimized");
-        toggleBtn.textContent = "←";
-      }
-    });
-    headerDiv.appendChild(toggleBtn);
-
     commentItem.appendChild(headerDiv);
 
-    // Comment text.
     const textDiv = document.createElement("div");
     textDiv.classList.add("comment-text");
     textDiv.textContent = comment.CommentText;
     commentItem.appendChild(textDiv);
 
-    // Interaction area for responses.
     const responseDiv = document.createElement("div");
     responseDiv.classList.add("response-area");
 
@@ -206,7 +175,7 @@ function renderComments(comments) {
 
     // Event listener for blur.
     textarea.addEventListener("blur", () => {
-      // Only update state if not complete.
+      // Only change state if not complete.
       if (comment.state !== "complete" && comment.stepElement) {
         if (!textarea.value.trim()) {
           comment.state = "untouched";
@@ -218,20 +187,26 @@ function renderComments(comments) {
     });
 
     // Event listener for "Mark as Complete" button.
-    completeBtn.addEventListener("click", () => {
-      if (comment.state === "complete") {
-        // Do not change state on focus/blur if already complete.
-        // (Alternatively, toggle back to in-progress if desired.)
-      } else {
-        // Mark as complete.
-        comment.response = textarea.value.trim();
-        comment.state = "complete";
-        if (comment.stepElement) {
-          comment.stepElement.classList.remove("untouched", "in-progress", "complete");
-          comment.stepElement.classList.add("complete");
-        }
-      }
-    });
+   completeBtn.addEventListener("click", () => {
+  if (comment.state === "complete") {
+    // Toggle back to in-progress so the user can edit.
+    comment.state = "in-progress";
+    completeBtn.classList.remove("btn-complete");
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("complete");
+      comment.stepElement.classList.add("in-progress");
+    }
+  } else {
+    // Mark as complete.
+    comment.response = textarea.value.trim();
+    comment.state = "complete";
+    completeBtn.classList.add("btn-complete");
+    if (comment.stepElement) {
+      comment.stepElement.classList.remove("untouched", "in-progress");
+      comment.stepElement.classList.add("complete");
+    }
+  }
+});
     responseDiv.appendChild(completeBtn);
 
     commentItem.appendChild(responseDiv);
@@ -405,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nameResponseDiv = document.createElement("div");
   nameResponseDiv.classList.add("response-area");
   const nameLabel = document.createElement("div");
-  nameLabel.textContent = "Let's start with your name:";
+  nameLabel.textContent = "➡️ Let's start with your name:";
   const nameInput = document.createElement("input");
   nameInput.placeholder = "Enter Your Full Name...";
   nameInput.id = "reviewerNameInput";
