@@ -155,12 +155,12 @@ function renderComments(comments) {
     responseDiv.classList.add("response-area");
 
     const textarea = document.createElement("textarea");
-    textarea.placeholder = "Your response here...";
+    textarea.placeholder = "Click to see relevant text...";
     textarea.required = true;
     responseDiv.appendChild(textarea);
 
     const completeBtn = document.createElement("button");
-    completeBtn.textContent = "Mark as Complete";
+    completeBtn.textContent = "✔";
 
     // Event listener for focus.
     textarea.addEventListener("focus", () => {
