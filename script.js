@@ -255,6 +255,16 @@ function highlightDocumentText(textID, highlight) {
   }
 }
 
+// Lock Portal after Submit
+function lockPortal() {
+  // Select all interactive elements in the portal.
+  // You can adjust the selector if you only want to target a specific container.
+  const interactiveElements = document.querySelectorAll("input, textarea, button");
+  interactiveElements.forEach((el) => {
+    el.disabled = true;
+  });
+}
+
 // Handle "Submit All" button click.
 function handleSubmitAll() {
   const documentId = getDocumentIdFromUrl();
@@ -280,7 +290,10 @@ function handleSubmitAll() {
     alert("Please fill out all comment responses.");
     return;
   }
+  // Lock the portal so no further changes can be made.
+  lockPortal();
 
+  // Proceed with submission...
   fetch(COMMENTS_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
