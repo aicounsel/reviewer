@@ -262,6 +262,10 @@ button:active {
 }
 
 #submitAllBtn {
+        background: #fff;
+      color: #706DEB;
+      border: 2px;
+      border: 2px solid #706DEB;
   display: inline-block; /* may conflict with footer */
   margin-top: 20px;  /* may conflict with footer */
 }
