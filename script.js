@@ -417,7 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <li>Hover over comments to highlight the relevant text.</li>
       <li>Check or uncheck comments to track your progress.</li>
       <li>Click "Submit All Answers" when you've completed your review.</li>
-      <li>We've identified <span class="comment-count">[X]</span> comments requiring your attention.</li>
+      <li>We've identified <span class="comment-count"></span> comments requiring your attention.</li>
     </ul>
     <p>Ready to begin? Let's get started.</p>
   `;
