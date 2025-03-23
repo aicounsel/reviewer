@@ -263,11 +263,12 @@ button:active {
 
 #submitAllBtn {
   background: #fff !important;
-  color: #706DEB !important;;
-  border: 2px !important;;
-  border: 2px solid #706DEB !important;;
-  display: inline-block; /* may conflict with footer */
-  margin-top: 20px;  /* may conflict with footer */
+  color: #706DEB !important;
+  border: 2px solid #706DEB !important;
+  padding: 10px 15px !important;      /* override padding */
+  margin-top: 20px !important;         /* override margin-top */
+  border-radius: 30px !important;      /* override border-radius */
+  display: inline-block !important;
 }
 
 /* --- STATES (use these classes in your JS) --- */
