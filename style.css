@@ -262,8 +262,8 @@ button:active {
 }
 
 #submitAllBtn {
-  background: #fff !important;
-  color: #706DEB !important;
+  background: #706DEB !important;
+  color: #fff !important;
   border: 2px solid #706DEB !important;
   padding: 10px 15px !important;      /* override padding */
   margin-top: 20px !important;         /* override margin-top */
