@@ -6,7 +6,7 @@
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background: #E5E8F0; /* not working */
+  background: #04041b; /* not working */
   color: #333;
   /*overflow: hidden; causing more problems than not*/
 }
