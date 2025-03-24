@@ -111,7 +111,7 @@ footer {
 }
 
 .right-panel {
-  background: #E5E8F0; /* Same as your chatbot background */
+  background: #04041b /*#E5E8F0; Same as your chatbot background */
   overflow-y: auto; /* It will scroll internally */
   padding: 40px; /*XXXXXX*/
 }
